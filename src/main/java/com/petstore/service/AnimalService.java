@@ -23,7 +23,7 @@ public class AnimalService {
     }
 
     private AnimalDTO mapToDto(Animal animal) {
-        return new AnimalDTO(animal.getShelternateId(), animal.getAnimalName(), animal.getSpecies(),
+        return new AnimalDTO(animal.getId(),animal.getShelternateId(), animal.getAnimalName(), animal.getSpecies(),
                 animal.getBirthDate(), animal.getSex(), animal.getColor());
     }
 
