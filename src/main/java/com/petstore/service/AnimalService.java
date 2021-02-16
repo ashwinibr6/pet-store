@@ -5,6 +5,7 @@ import com.petstore.model.Animal;
 import com.petstore.repository.AnimalRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,4 +36,21 @@ public class AnimalService {
     public List<AnimalDTO> getAnimals() {
         return animalRepository.findAll().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
     }
+
+    public List<AnimalDTO> addAnimals(List<AnimalDTO> animals) {
+        List<Animal> animalList = new ArrayList<>();
+        for(AnimalDTO animalDto : animals){
+            animalList.add(mapTo(animalDto));
+        }
+        animalList = animalRepository.saveAll(animalList);
+
+        List<AnimalDTO> animalsDtos = new ArrayList<>();
+        for(Animal animal : animalList){
+            animalsDtos.add(mapToDto(animal));
+        }
+
+        return animalsDtos;
+    }
+
+
 }
