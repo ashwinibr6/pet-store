@@ -8,11 +8,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode
+//@EqualsAndHashCode
 @ToString
 @NoArgsConstructor
 public class Animal {
@@ -34,5 +35,24 @@ public class Animal {
         this.birthDate = birthDate;
         this.sex = sex;
         this.color = color;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Animal animal = (Animal) o;
+        return Objects.equals(id, animal.id) &&
+                Objects.equals(shelternateId, animal.shelternateId) &&
+                Objects.equals(animalName, animal.animalName) &&
+                Objects.equals(species, animal.species) &&
+                Objects.equals(birthDate, animal.birthDate) &&
+                Objects.equals(sex, animal.sex) &&
+                Objects.equals(color, animal.color);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, shelternateId, animalName, species, birthDate, sex, color);
     }
 }

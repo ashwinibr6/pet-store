@@ -1,7 +1,6 @@
 package com.petstore.IntegrationTests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.petstore.model.Animal;
 import com.petstore.repository.AnimalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.petstore.model.Animal;
 
 @SpringBootTest
 @AutoConfigureMockMvc
