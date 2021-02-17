@@ -1,5 +1,9 @@
 package com.petstore.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -9,13 +13,16 @@ import java.util.Objects;
 @Getter
 @Setter
 @AllArgsConstructor
-@EqualsAndHashCode
+@NoArgsConstructor
 public class AnimalDTO {
 
     private Long id;
     private String shelternateId;
     private String animalName;
     private String species;
+
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate birthDate;
     private String sex;
     private String color;
@@ -25,8 +32,7 @@ public class AnimalDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AnimalDTO animalDTO = (AnimalDTO) o;
-        return Objects.equals(id, animalDTO.id) &&
-                Objects.equals(shelternateId, animalDTO.shelternateId) &&
+        return Objects.equals(shelternateId, animalDTO.shelternateId) &&
                 Objects.equals(animalName, animalDTO.animalName) &&
                 Objects.equals(species, animalDTO.species) &&
                 Objects.equals(birthDate, animalDTO.birthDate) &&
@@ -36,6 +42,6 @@ public class AnimalDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, shelternateId, animalName, species, birthDate, sex, color);
+        return Objects.hash(shelternateId, animalName, species, birthDate, sex, color);
     }
 }
