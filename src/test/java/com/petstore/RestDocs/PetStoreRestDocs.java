@@ -21,12 +21,12 @@ public class PetStoreRestDocs {
     @Autowired
     MockMvc mockMvc;
 
-    @Test
-    void homePage() throws Exception {
-        mockMvc.perform(get("/home"))
-                .andExpect(status().isOk())
-                .andDo(document("home"));
-    }
+//    @Test
+//    void homePage() throws Exception {
+//        mockMvc.perform(get("/home"))
+//                .andExpect(status().isOk())
+//                .andDo(document("home"));
+//    }
 
 
 
