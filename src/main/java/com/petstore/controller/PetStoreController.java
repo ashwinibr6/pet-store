@@ -41,6 +41,7 @@ public class PetStoreController {
     }
 
     @GetMapping("animals")
+    @ResponseStatus(HttpStatus.OK)
     public List<AnimalDTO> getAllAnimals(){
         return animalService.getAnimals();
     }
@@ -58,12 +59,11 @@ public class PetStoreController {
     @DeleteMapping("/animalreturns")
     @ResponseStatus(HttpStatus.OK)
     public void returnAnimalToShelter(@RequestBody List<String> shelterIds){
-        System.out.println("inside method");
-       // List<String> ids=animalDTO.stream().map(animalDTO1 -> animalDTO1.getShelternateId()).collect(Collectors.toList());
-       //restTemplate.put("",shelterIds);
 
-       animalService.removeAnimals(shelterIds);
-
+        HttpStatus status=shelterNetService.returnAnimalToShelter(shelterIds);
+        if(status.is2xxSuccessful()){
+            animalService.removeAnimals(shelterIds);
+        }
 
     }
 }

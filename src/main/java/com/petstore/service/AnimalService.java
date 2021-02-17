@@ -5,10 +5,12 @@ import com.petstore.model.Animal;
 import com.petstore.repository.AnimalRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class AnimalService {
 
     private AnimalRepository animalRepository;

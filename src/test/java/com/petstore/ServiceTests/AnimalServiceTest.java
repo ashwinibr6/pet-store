@@ -97,8 +97,7 @@ public class AnimalServiceTest {
 
     @Test
     public void returnAnimalToShelter(){
-        AnimalDTO animalDTO=new AnimalDTO();
-        animalDTO
+
         animalService.removeAnimals(List.of("101"));
         verify(animalRepository, times(1)).deleteAnimalByShelternateId("101");
 

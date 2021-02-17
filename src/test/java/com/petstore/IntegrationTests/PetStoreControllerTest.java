@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -100,26 +101,27 @@ public class PetStoreControllerTest {
 
     @Test
     public void returnAnimalToShelter() throws Exception {
-        animalRepository.saveAll(List.of(
-                new Animal("101","Lion1","species",LocalDate.of(2015,12,27)
-                        , "Male","Gold"),
-                new Animal("102","Monkey","species",LocalDate.of(2017,3,12)
-                        , "Female","Gold"),
-                new Animal("103","Cat","species",LocalDate.of(2018,2,7)
-                        , "Male","Gold"),
-                new Animal("104","Zebra","species",LocalDate.of(2020,1,1)
-                        , "Female","Gold")));
 
-        Animal animal=new Animal("101","Lion1","species",LocalDate.of(2015,10,27)
+        Animal animal1= new Animal("101","Lion1","species",LocalDate.of(2015,12,27)
+                        , "Male","Gold");
+        Animal animal2=  new Animal("102","Monkey","species",LocalDate.of(2017,3,12)
+                        , "Female","Gold");
+        Animal animal3=     new Animal("103","Cat","species",LocalDate.of(2018,2,7)
+                        , "Male","Gold");
+        Animal animal4=    new Animal("104","Zebra","species",LocalDate.of(2020,1,1)
+                        , "Female","Gold");
+
+        Animal animal5=new Animal("101","Lion1","species",LocalDate.of(2015,10,27)
                 , "Male","Gold");
 
-        List<String> animalsShelterIds=new ArrayList<>();
-        animalsShelterIds.add(animal.getShelternateId());
+        animalRepository.saveAll(List.of(animal1,animal2,animal3,animal4,animal5));
+
+
 
 
         mockMvc.perform(delete("/animalreturns")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(mapper.writeValueAsString(animalsShelterIds)))
+                            .content(mapper.writeValueAsString(List.of(animal1.getShelternateId(),animal2.getShelternateId()))))
                 .andExpect(status().isOk());
 
     }

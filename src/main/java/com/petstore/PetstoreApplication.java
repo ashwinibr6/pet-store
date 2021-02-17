@@ -13,10 +13,10 @@ public class PetstoreApplication {
 		SpringApplication.run(PetstoreApplication.class, args);
 	}
 
-	@Bean
-	public RestTemplate restTemplate(RestTemplateBuilder builder) {
-		return builder.build();
-	}
+//	@Bean
+//	public RestTemplate restTemplate(RestTemplateBuilder builder) {
+//		return builder.build();
+//	}
 
 
 }
