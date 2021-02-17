@@ -13,3 +13,20 @@ include::{snippets}/fetchAnimals/http-request.adoc[]
 
 .response
 include::{snippets}/fetchAnimals/http-response.adoc[]
+
+
+== Get All animals from Pet Store
+.request
+include::{snippets}/getAllAnimals/http-request.adoc[]
+
+.response
+include::{snippets}/getAllAnimals/http-response.adoc[]
+
+
+
+== Return Animal to Shelter
+.request
+include::{snippets}/returnAnimalToShelter/http-request.adoc[]
+
+.response
+include::{snippets}/returnAnimalToShelter/http-response.adoc[]

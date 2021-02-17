@@ -5,10 +5,12 @@ import com.petstore.model.Animal;
 import com.petstore.repository.AnimalRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class AnimalService {
 
     private AnimalRepository animalRepository;
@@ -27,6 +29,10 @@ public class AnimalService {
                 animal.getBirthDate(), animal.getSex(), animal.getColor());
     }
 
+    public AnimalDTO addAnimal(AnimalDTO animalDTO) {
+        Animal animal = animalRepository.save(mapTo(animalDTO));
+        return mapToDto(animal);
+    }
 
     public List<AnimalDTO> getAnimals() {
         return animalRepository.findAll().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
@@ -41,4 +47,11 @@ public class AnimalService {
     }
 
 
+
+    public void removeAnimals(List<String> shelterIds) {
+        for (String id:shelterIds) {
+            animalRepository.deleteAnimalByShelternateId(id);
+        }
+
+    }
 }
