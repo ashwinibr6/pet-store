@@ -38,6 +38,7 @@ public class AnimalService {
     }
 
     public List<AnimalDTO> addAnimals(List<AnimalDTO> animals) {
+
         List<Animal> animalList = new ArrayList<>();
         for(AnimalDTO animalDto : animals){
             animalList.add(mapTo(animalDto));

@@ -66,9 +66,7 @@ public class AnimalServiceTest {
                 new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
         when(animalRepository.saveAll(animalsEntities)).thenReturn(animalsEntities);
-
-
-        ObjectMapper mapper =  new ObjectMapper();
+        
 
         List<AnimalDTO> actual = animalService.addAnimals(animalsDto);
 
