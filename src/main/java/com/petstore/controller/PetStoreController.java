@@ -4,6 +4,7 @@ import com.petstore.dto.AnimalDTO;
 import com.petstore.service.AnimalService;
 import com.petstore.service.ShelterNetService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/")
 public class PetStoreController {
-
 
     private AnimalService animalService;
 

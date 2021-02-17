@@ -6,3 +6,10 @@ include::{snippets}/home/http-request.adoc[]
 
 .response
 include::{snippets}/home/http-response.adoc[]
+
+== Fetch animal from ShelterNet and add to pet store
+.request
+include::{snippets}/fetchAnimals/http-request.adoc[]
+
+.response
+include::{snippets}/fetchAnimals/http-response.adoc[]
