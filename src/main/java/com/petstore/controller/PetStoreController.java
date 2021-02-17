@@ -64,6 +64,16 @@ public class PetStoreController {
         if(status.is2xxSuccessful()){
             animalService.removeAnimals(shelterIds);
         }
-
     }
+
+    @DeleteMapping("/sickanimals")
+    @ResponseStatus(HttpStatus.OK)
+    public void  returnSickAnimalToShelter(){
+        returnAnimalToShelter(animalService.findSickAnimals());
+    }
+
+
+
+
+
 }

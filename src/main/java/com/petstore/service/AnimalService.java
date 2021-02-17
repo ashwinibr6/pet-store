@@ -21,12 +21,12 @@ public class AnimalService {
 
     private Animal mapTo(AnimalDTO animalDTO) {
         return new Animal(animalDTO.getShelternateId(), animalDTO.getAnimalName(), animalDTO.getSpecies(),
-                animalDTO.getBirthDate(), animalDTO.getSex(), animalDTO.getColor());
+                animalDTO.getBirthDate(), animalDTO.getSex(), animalDTO.getColor(),animalDTO.getIsSick(),animalDTO.getDiagnose());
     }
 
     private AnimalDTO mapToDto(Animal animal) {
         return new AnimalDTO(animal.getId(),animal.getShelternateId(), animal.getAnimalName(), animal.getSpecies(),
-                animal.getBirthDate(), animal.getSex(), animal.getColor());
+                animal.getBirthDate(), animal.getSex(), animal.getColor(), animal.getIsSick(),animal.getDiagnose());
     }
 
     public AnimalDTO addAnimal(AnimalDTO animalDTO) {
@@ -53,5 +53,10 @@ public class AnimalService {
             animalRepository.deleteAnimalByShelternateId(id);
         }
 
+    }
+
+    public List<String> findSickAnimals() {
+        List<Animal> animals=animalRepository.findAllByIsSick(true);
+        return animals.stream().map(animal -> animal.getShelternateId()).collect(Collectors.toList());
     }
 }

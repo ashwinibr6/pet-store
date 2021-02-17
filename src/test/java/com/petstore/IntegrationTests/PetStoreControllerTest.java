@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import javax.transaction.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,9 +60,9 @@ public class PetStoreControllerTest {
     public void getAllAnimals() throws Exception {
         animalRepository.saveAll(List.of(
                 new Animal("101","Lion1","species",LocalDate.of(2015,12,27)
-                , "Male","Gold"),
+                , "Male","Gold",false, null),
                 new Animal("101","Lion2","species",LocalDate.of(2017,3,12)
-                        , "Female","Gold")));
+                        , "Female","Gold",false, null)));
 
         mockMvc.perform(get("/animals"))
                 .andExpect(status().isOk());
@@ -72,11 +74,11 @@ public class PetStoreControllerTest {
 
 
         List<AnimalDTO> animals = List.of(
-                new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
-                new AnimalDTO(3l, "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
-                new AnimalDTO(4l,"4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
-                new AnimalDTO(5l, "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+                new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null),
+                new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null),
+                new AnimalDTO(3l, "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW" ,false, null),
+                new AnimalDTO(4l,"4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE", false, null),
+                new AnimalDTO(5l, "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN" ,false, null)
         );
 
 
@@ -103,16 +105,16 @@ public class PetStoreControllerTest {
     public void returnAnimalToShelter() throws Exception {
 
         Animal animal1= new Animal("101","Lion1","species",LocalDate.of(2015,12,27)
-                        , "Male","Gold");
+                        , "Male","Gold",false, null);
         Animal animal2=  new Animal("102","Monkey","species",LocalDate.of(2017,3,12)
-                        , "Female","Gold");
+                        , "Female","Gold",false, null);
         Animal animal3=     new Animal("103","Cat","species",LocalDate.of(2018,2,7)
-                        , "Male","Gold");
+                        , "Male","Gold",false, null);
         Animal animal4=    new Animal("104","Zebra","species",LocalDate.of(2020,1,1)
-                        , "Female","Gold");
+                        , "Female","Gold",false, null);
 
         Animal animal5=new Animal("101","Lion1","species",LocalDate.of(2015,10,27)
-                , "Male","Gold");
+                , "Male","Gold",false, null);
 
         animalRepository.saveAll(List.of(animal1,animal2,animal3,animal4,animal5));
 
@@ -126,6 +128,33 @@ public class PetStoreControllerTest {
 
     }
 
+    //Given there are animals hosted in Pet Store
+    //When an animal becomes sick
+    //Then a diagnosis is attached to the animal
+    //And the animal is sent back to Shelternet
+
+    @Test
+    public void returnSickAnimalToShelter() throws Exception {
+        Animal animal1 = new Animal("101", "Lion1", "species", LocalDate.of(2015, 12, 27)
+                , "Male", "Gold", false, null);
+        Animal animal2 = new Animal("102", "Monkey", "species", LocalDate.of(2017, 3, 12)
+                , "Female", "Gold", false, null);
+        Animal animal3 = new Animal("103", "Cat", "species", LocalDate.of(2018, 2, 7)
+                , "Male", "Gold", false, null);
+        Animal animal4 = new Animal("104", "Zebra", "species", LocalDate.of(2020, 1, 1)
+                , "Female", "Gold", false, null);
+
+        Animal animal5 = new Animal("101", "Lion1", "species", LocalDate.of(2015, 10, 27)
+                , "Male", "Gold", false, null);
+
+        animalRepository.saveAll(List.of(animal1, animal2, animal3, animal4, animal5));
+
+
+        mockMvc.perform(delete("/sickanimals"))
+                .andExpect(status().isOk());
+
+
+    }
 
 
 }

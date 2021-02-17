@@ -27,6 +27,9 @@ public class AnimalDTO {
     private String sex;
     private String color;
 
+    private Boolean isSick;
+    private String diagnose;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

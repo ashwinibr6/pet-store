@@ -79,8 +79,8 @@ public class PetStoreRestDocs {
     @Test
     public void getAllAnimals() throws Exception {
 
-        AnimalDTO animalDTO1=new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK");
-        AnimalDTO animalDTo2=new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN");
+        AnimalDTO animalDTO1=new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null);
+        AnimalDTO animalDTo2=new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null);
 
 
         mockMvc
@@ -114,8 +114,8 @@ public class PetStoreRestDocs {
     @Test
     public void returnAnimalToShelter() throws Exception {
 
-        AnimalDTO animalDTO1=new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK");
-        AnimalDTO animalDTo2=new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN");
+        AnimalDTO animalDTO1=new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null);
+        AnimalDTO animalDTo2=new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null);
 
         List<String> animalsIds = List.of("1","2");
 

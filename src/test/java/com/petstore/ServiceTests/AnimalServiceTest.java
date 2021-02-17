@@ -41,10 +41,10 @@ public class AnimalServiceTest {
 
 
         Animal animal1=new Animal("101","Lion1","species", LocalDate.of(2015,12,27)
-                , "Male","Gold");
+                , "Male","Gold", false, null);
 
         Animal animal2=new Animal("102","Lion1","species", LocalDate.of(2015,12,27)
-                , "Male","Gold");
+                , "Male","Gold", false, null);
 
         List<Animal> expected=new ArrayList<>();
         expected.add(animal1);
@@ -74,19 +74,19 @@ public class AnimalServiceTest {
     @Test
     public void addAnimals() throws Exception {
         List<AnimalDTO> animalsDto = List.of(
-                new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
-                new AnimalDTO(3l, "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
-                new AnimalDTO(4l,"4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
-                new AnimalDTO(5l, "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+                new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null),
+                new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null),
+                new AnimalDTO(3l, "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",false, null),
+                new AnimalDTO(4l,"4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",false, null),
+                new AnimalDTO(5l, "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",false, null)
         );
 
         List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
-                new Animal("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
-                new Animal("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
-                new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null),
+                new Animal("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",false, null),
+                new Animal("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",false, null),
+                new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",false, null)
         );
         when(animalRepository.saveAll(animalsEntities)).thenReturn(animalsEntities);
 
