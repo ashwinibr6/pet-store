@@ -1,13 +1,14 @@
 package com.petstore.dto;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Value;
 
+import javax.persistence.SequenceGenerator;
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Value
-@Data
 public class AnimalDTO {
 
     private Long id;
@@ -17,6 +18,19 @@ public class AnimalDTO {
     private LocalDate birthDate;
     private String sex;
     private String color;
+
+    public AnimalDTO(){
+
+    }
+
+//    public AnimalDTO(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color) {
+//        this.shelternateId = shelternateId;
+//        this.animalName = animalName;
+//        this.species = species;
+//        this.birthDate = birthDate;
+//        this.sex = sex;
+//        this.color = color;
+//    }
 
     @Override
     public boolean equals(Object o) {

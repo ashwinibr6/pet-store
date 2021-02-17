@@ -35,4 +35,11 @@ public class AnimalService {
     public List<AnimalDTO> getAnimals() {
         return animalRepository.findAll().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
     }
+
+    public void removeAnimals(List<String> shelterIds) {
+        for (String id:shelterIds) {
+            animalRepository.deleteAnimalByShelternateId(id);
+        }
+
+    }
 }
