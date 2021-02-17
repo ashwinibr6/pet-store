@@ -1,5 +1,7 @@
 package com.petstore.ServiceTests;
 
+import com.petstore.dto.AnimalDTO;
+import com.petstore.model.Animal;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.dto.AnimalDTO;
@@ -24,6 +26,13 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.util.List;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.ExpectedCount.once;
@@ -41,9 +50,37 @@ public class AnimalServiceTest {
     @InjectMocks
     AnimalService animalService;
 
-
     @Test
     public void getAllAnimals(){
+
+
+        Animal animal1=new Animal("101","Lion1","species", LocalDate.of(2015,12,27)
+                , "Male","Gold");
+
+        Animal animal2=new Animal("102","Lion1","species", LocalDate.of(2015,12,27)
+                , "Male","Gold");
+
+        List<Animal> expected=new ArrayList<>();
+        expected.add(animal1);
+        expected.add(animal2);
+
+        when(animalRepository.findAll()).thenReturn(expected);
+
+        List<AnimalDTO> actual=animalService.getAnimals();
+
+
+        verify(animalRepository, times(1)).findAll();
+
+        assertEquals(expected.get(0).getShelternateId(),actual.get(0).getShelternateId());
+        assertEquals(expected.get(0).getAnimalName(),actual.get(0).getAnimalName());
+        assertEquals(expected.get(0).getBirthDate(),actual.get(0).getBirthDate());
+        assertEquals(expected.get(0).getColor(),actual.get(0).getColor());
+        assertEquals(expected.get(0).getSex(),actual.get(0).getSex());
+        assertEquals(expected.get(0).getSpecies(),actual.get(0).getSpecies());
+
+
+        assertEquals(expected.size(),actual.size());
+
 
     }
 
@@ -66,7 +103,7 @@ public class AnimalServiceTest {
                 new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
         when(animalRepository.saveAll(animalsEntities)).thenReturn(animalsEntities);
-        
+
 
         List<AnimalDTO> actual = animalService.addAnimals(animalsDto);
 
