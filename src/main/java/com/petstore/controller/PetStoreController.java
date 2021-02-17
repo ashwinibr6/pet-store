@@ -1,8 +1,10 @@
 package com.petstore.controller;
 
 import com.petstore.dto.AnimalDTO;
-import com.petstore.model.Animal;
 import com.petstore.service.AnimalService;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.petstore.service.ShelterNetService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,12 +22,11 @@ public class PetStoreController {
 
     private AnimalService animalService;
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private ShelterNetService shelterNetService;
 
-
-    public PetStoreController(AnimalService animalService) {
+    public PetStoreController(AnimalService animalService, ShelterNetService shelterNetService) {
         this.animalService = animalService;
+        this.shelterNetService = shelterNetService;
     }
 
     @GetMapping("home")
@@ -41,6 +43,16 @@ public class PetStoreController {
     @GetMapping("animals")
     public List<AnimalDTO> getAllAnimals(){
         return animalService.getAnimals();
+    }
+
+
+
+    @PostMapping("/animals")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<AnimalDTO> addAnimals(@RequestBody List<Integer> animalIds){
+
+        List<AnimalDTO> animals = shelterNetService.fetchAnimals(animalIds);
+        return animalService.addAnimals(animals);
     }
 
     @DeleteMapping("/animalreturns")

@@ -15,8 +15,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import java.util.ArrayList;
+
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+
+
+import static org.mockito.Mockito.when;
+
+
 
 @ExtendWith(MockitoExtension.class)
 public class AnimalServiceTest {
@@ -59,6 +68,31 @@ public class AnimalServiceTest {
         assertEquals(expected.size(),actual.size());
 
 
+    }
+
+
+    @Test
+    public void addAnimals() throws Exception {
+        List<AnimalDTO> animalsDto = List.of(
+                new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
+                new AnimalDTO(3l, "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
+                new AnimalDTO(4l,"4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
+                new AnimalDTO(5l, "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+        );
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
+                new Animal("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
+                new Animal("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
+                new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+        );
+        when(animalRepository.saveAll(animalsEntities)).thenReturn(animalsEntities);
+
+        List<AnimalDTO> actual = animalService.addAnimals(animalsDto);
+
+        assertEquals(animalsDto, actual);
     }
 
     @Test
