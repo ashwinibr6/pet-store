@@ -9,9 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -92,5 +93,13 @@ public class AnimalServiceTest {
         List<AnimalDTO> actual = animalService.addAnimals(animalsDto);
 
         assertEquals(animalsDto, actual);
+    }
+
+    @Test
+    public void returnAnimalToShelter(){
+
+        animalService.removeAnimals(List.of("101"));
+        verify(animalRepository, times(1)).deleteAnimalByShelternateId("101");
+
     }
 }
