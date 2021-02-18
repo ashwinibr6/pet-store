@@ -13,3 +13,10 @@ include::{snippets}/fetchAnimals/http-request.adoc[]
 
 .response
 include::{snippets}/fetchAnimals/http-response.adoc[]
+
+== Create animal adoption request with the pet store
+.request
+include::{snippets}/createAdoptAnimalRequest/http-request.adoc[]
+
+.response
+include::{snippets}/createAdoptAnimalRequest/http-response.adoc[]

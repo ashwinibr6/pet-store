@@ -1,7 +1,11 @@
 package com.petstore.RestDocs;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.petstore.POJO.CustomerRequest;
+import com.petstore.model.Animal;
+import com.petstore.repository.AnimalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +14,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -32,10 +38,14 @@ public class PetStoreRestDocs {
 
     ObjectMapper mapper;
 
+    @Autowired
+    AnimalRepository animalRepository;
+
 
     @BeforeEach
     public void setUp(){
         mapper = new ObjectMapper();
+        animalRepository.deleteAll();
     }
 
     @Test
@@ -54,7 +64,6 @@ public class PetStoreRestDocs {
                         .content(mapper.writeValueAsString(animalsIds)))
                 .andExpect(status().isCreated())
                 .andDo(document("fetchAnimals", responseFields(
-                        fieldWithPath("[0].id").description("Id of the animal in pet store"),
                         fieldWithPath("[0].shelternateId").description("shelternateId of the animal"),
                         fieldWithPath("[0].animalName").description("Name of the animal"),
                         fieldWithPath("[0].species").description("Species of the animal"),
@@ -67,6 +76,33 @@ public class PetStoreRestDocs {
 
     }
 
+    @Test
+    public void createAdoptAnimalRequest() throws Exception {
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+        );
+        animalsEntities = animalRepository.saveAll(animalsEntities);
+        List<String> shelterNetIds = List.of(animalsEntities.get(0).getShelternateId(),animalsEntities.get(1).getShelternateId());
+
+
+        CustomerRequest customerRequest = new CustomerRequest("customer", shelterNetIds);
+        mockMvc
+                .perform(post("/adopt").contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(customerRequest)))
+                .andExpect(status().isCreated())
+                .andDo(document("createAdoptAnimalRequest", responseFields(
+                        fieldWithPath("client").description("Name of the client"),
+                        fieldWithPath("animalDTOS.[0].shelternateId").description("shelternateId of the animal"),
+                        fieldWithPath("animalDTOS.[0].animalName").description("Name of the animal"),
+                        fieldWithPath("animalDTOS.[0].species").description("Species of the animal"),
+                        fieldWithPath("animalDTOS.[0].birthDate").description("BirthDate of the animal"),
+                        fieldWithPath("animalDTOS.[0].sex").description("Sex of the animal"),
+                        fieldWithPath("animalDTOS.[0].color").description("Color of the animal")
+
+                )));
+    }
 
 
 }
