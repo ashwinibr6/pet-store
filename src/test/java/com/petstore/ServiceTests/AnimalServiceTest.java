@@ -5,6 +5,7 @@ import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
+import com.petstore.model.Status;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import com.petstore.service.AnimalService;
@@ -88,12 +89,12 @@ public class AnimalServiceTest {
                 new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
                 new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
         );
-        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals);
+        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals, Status.PENDING.name());
         List<Animal> animalsEntities = List.of(
                 new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
                 new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
          );
-        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities);
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.name());
 
         when(animalRepository.findByShelternateId("1")).thenReturn(animalsEntities.get(0));
         when(animalRepository.findByShelternateId("2")).thenReturn(animalsEntities.get(1));

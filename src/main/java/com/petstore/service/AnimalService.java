@@ -5,6 +5,7 @@ import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
+import com.petstore.model.Status;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class AnimalService {
     private AdoptionRequestDTO mapToAdoptionRequestDto(AdoptionRequest adoptionRequest) {
         List<AnimalDTO> animalDTOS =
                 adoptionRequest.getAnimals().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
-        return new AdoptionRequestDTO(adoptionRequest.getClient(), animalDTOS);
+        return new AdoptionRequestDTO(adoptionRequest.getClient(), animalDTOS, adoptionRequest.getStatus());
     }
 
     public List<AnimalDTO> getAnimals() {
@@ -57,7 +58,7 @@ public class AnimalService {
         List<Animal> animals = customerRequest.getShelterNetIds()
                 .stream().map(id -> animalRepository.findByShelternateId(id))
                 .collect(Collectors.toList());
-        AdoptionRequest adoptionRequest = new AdoptionRequest(customerRequest.getClient(), animals);
+        AdoptionRequest adoptionRequest = new AdoptionRequest(customerRequest.getClient(), animals, Status.PENDING.name());
         return mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
     }
 

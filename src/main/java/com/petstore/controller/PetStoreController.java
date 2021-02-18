@@ -1,6 +1,7 @@
 package com.petstore.controller;
 
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.service.AnimalService;
@@ -65,5 +66,11 @@ public class PetStoreController {
                 animalService.removeAnimals(List.of(shelternateId));
             }
         }
+    }
+
+    @PutMapping("adopt/request/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void processAdoptionRequest(@PathVariable Long id, @RequestBody ProcessAdoptionRequest processAdoptionRequest) {
+
     }
 }

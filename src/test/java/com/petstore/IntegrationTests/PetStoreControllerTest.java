@@ -1,11 +1,16 @@
 package com.petstore.IntegrationTests;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
+import com.petstore.model.Status;
+import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +27,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -36,6 +40,9 @@ public class PetStoreControllerTest {
 
     @Autowired
     AnimalRepository animalRepository;
+
+    @Autowired
+    AdoptionRequestRepository adoptionRequestRepository;
 
     ObjectMapper mapper;
 
@@ -95,7 +102,7 @@ public class PetStoreControllerTest {
                 new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
                 new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
        );
-        AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer",animals);
+        AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer",animals, Status.PENDING.toString());
 
         List<Animal> animalsEntities = List.of(
                 new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
@@ -157,5 +164,30 @@ public class PetStoreControllerTest {
 
         mockMvc.perform(delete("/sickanimal/?shelternateId=101&diagnosis=fever"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void approveAdoptionRequest() throws Exception {
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+        );
+        animalsEntities = animalRepository.saveAll(animalsEntities);
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.toString());
+        adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
+
+
+        /* TO BE IMPLEMENTED */
+       // If any inseparable pets are all part of the request AND
+
+        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "ready to be adopted");
+
+        mockMvc
+                .perform(put("/adopt/request/"+adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(processRequest)))
+                .andExpect(status().isAccepted());
+
+
     }
 }

@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -19,26 +20,24 @@ public class AdoptionRequest {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Animal> animals ;
 
-    public AdoptionRequest(String client, List<Animal> animals) {
+    private String status;
+
+    public AdoptionRequest(String client, List<Animal> animals, String status) {
         this.client = client;
         this.animals = animals;
+        this.status = status;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         AdoptionRequest that = (AdoptionRequest) o;
-
-        if (client != null ? !client.equals(that.client) : that.client != null) return false;
-        return animals != null ? animals.equals(that.animals) : that.animals == null;
+        return Objects.equals(client, that.client) && Objects.equals(animals, that.animals) && Objects.equals(status, that.status);
     }
 
     @Override
     public int hashCode() {
-        int result = client != null ? client.hashCode() : 0;
-        result = 31 * result + (animals != null ? animals.hashCode() : 0);
-        return result;
+        return Objects.hash(client, animals, status);
     }
 }
