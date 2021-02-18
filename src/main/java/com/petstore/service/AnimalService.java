@@ -1,7 +1,11 @@
 package com.petstore.service;
 
+import com.petstore.POJO.CustomerRequest;
+import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
+import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +18,12 @@ import java.util.stream.Collectors;
 public class AnimalService {
 
     private AnimalRepository animalRepository;
+    private AdoptionRequestRepository adoptionRequestRepository;
 
-    public AnimalService(AnimalRepository animalRepository) {
+    public AnimalService(AnimalRepository animalRepository,
+                         AdoptionRequestRepository adoptionRequestRepository) {
         this.animalRepository = animalRepository;
+        this.adoptionRequestRepository = adoptionRequestRepository;
     }
 
     private Animal mapTo(AnimalDTO animalDTO) {
@@ -25,10 +32,15 @@ public class AnimalService {
     }
 
     private AnimalDTO mapToDto(Animal animal) {
-        return new AnimalDTO(animal.getId(),animal.getShelternateId(), animal.getAnimalName(), animal.getSpecies(),
+        return new AnimalDTO(animal.getShelternateId(), animal.getAnimalName(), animal.getSpecies(),
                 animal.getBirthDate(), animal.getSex(), animal.getColor());
     }
 
+    private AdoptionRequestDTO mapToAdoptionRequestDto(AdoptionRequest adoptionRequest) {
+        List<AnimalDTO> animalDTOS =
+                adoptionRequest.getAnimals().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
+        return new AdoptionRequestDTO(adoptionRequest.getClient(), animalDTOS);
+    }
     public AnimalDTO addAnimal(AnimalDTO animalDTO) {
         Animal animal = animalRepository.save(mapTo(animalDTO));
         return mapToDto(animal);
@@ -47,6 +59,17 @@ public class AnimalService {
     }
 
 
+    public AdoptionRequestDTO createAdoptionRequest(CustomerRequest customerRequest) {
+
+        List<Animal> animals = customerRequest.getShelterNetIds()
+                .stream().map(id -> animalRepository.findByShelternateId(id))
+                .collect(Collectors.toList());
+
+        AdoptionRequest adoptionRequest = new AdoptionRequest(customerRequest.getClient(), animals);
+
+        return mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
+
+    }
 
     public void removeAnimals(List<String> shelterIds) {
         for (String id:shelterIds) {

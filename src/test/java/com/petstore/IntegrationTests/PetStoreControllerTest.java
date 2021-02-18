@@ -2,6 +2,8 @@ package com.petstore.IntegrationTests;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.petstore.POJO.CustomerRequest;
+import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.model.Animal;
 import com.petstore.repository.AnimalRepository;
@@ -14,9 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-
 import javax.transaction.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,7 +25,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.petstore.model.Animal;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,10 +39,12 @@ public class PetStoreControllerTest {
 
     ObjectMapper mapper;
 
+
     @BeforeEach
     void setUp() {
         mapper =  new ObjectMapper();
     }
+
 
     @Test
     public void homePage() throws Exception {
@@ -68,15 +69,12 @@ public class PetStoreControllerTest {
 
     @Test
     public void retrieveListAnimalsFromShelterAndStore() throws Exception {
-
-
-
         List<AnimalDTO> animals = List.of(
-                new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
-                new AnimalDTO(3l, "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
-                new AnimalDTO(4l,"4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
-                new AnimalDTO(5l, "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
+                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
+                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
+                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
 
 
@@ -91,13 +89,40 @@ public class PetStoreControllerTest {
         });
 
         assertEquals(animals, actual);
+    }
 
+    @Test
+    public void createAdoptAnimalRequest() throws Exception {
+
+        List<AnimalDTO> animals = List.of(
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+       );
+        AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer",animals);
+
+
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+       );
+        animalsEntities = animalRepository.saveAll(animalsEntities);
+        List<String> shelterNetIds = List.of(animalsEntities.get(0).getShelternateId(),animalsEntities.get(1).getShelternateId());
+
+
+        CustomerRequest customerRequest = new CustomerRequest("customer", shelterNetIds);
+        MvcResult result = mockMvc
+                .perform(post("/adopt").contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(customerRequest)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        AdoptionRequestDTO actual = mapper.readValue(result.getResponse().getContentAsString(), AdoptionRequestDTO.class);
+
+        assertEquals(adoptionRequest, actual);
     }
 
 
-    //Given there are animals hosted in Pet Store
-    //When I return them back to Shelternet
-    //Then I no longer see them in my store
 
     @Test
     public void returnAnimalToShelter() throws Exception {

@@ -7,16 +7,15 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class AnimalDTO {
 
-    private Long id;
     private String shelternateId;
     private String animalName;
     private String species;
@@ -27,21 +26,4 @@ public class AnimalDTO {
     private String sex;
     private String color;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AnimalDTO animalDTO = (AnimalDTO) o;
-        return Objects.equals(shelternateId, animalDTO.shelternateId) &&
-                Objects.equals(animalName, animalDTO.animalName) &&
-                Objects.equals(species, animalDTO.species) &&
-                Objects.equals(birthDate, animalDTO.birthDate) &&
-                Objects.equals(sex, animalDTO.sex) &&
-                Objects.equals(color, animalDTO.color);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(shelternateId, animalName, species, birthDate, sex, color);
-    }
 }
