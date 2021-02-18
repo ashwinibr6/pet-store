@@ -25,5 +25,4 @@ public class AnimalDTO {
     private LocalDate birthDate;
     private String sex;
     private String color;
-
 }
