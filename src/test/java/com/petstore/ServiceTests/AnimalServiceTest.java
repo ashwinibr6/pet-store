@@ -21,8 +21,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-
-
 @ExtendWith(MockitoExtension.class)
 public class AnimalServiceTest {
 
@@ -38,7 +36,6 @@ public class AnimalServiceTest {
     @Test
     public void getAllAnimals(){
 
-
         Animal animal1=new Animal("101","Lion1","species", LocalDate.of(2015,12,27)
                 , "Male","Gold");
 
@@ -50,10 +47,7 @@ public class AnimalServiceTest {
         expected.add(animal2);
 
         when(animalRepository.findAll()).thenReturn(expected);
-
         List<AnimalDTO> actual=animalService.getAnimals();
-
-
         verify(animalRepository, times(1)).findAll();
 
         assertEquals(expected.get(0).getShelternateId(),actual.get(0).getShelternateId());
@@ -62,13 +56,8 @@ public class AnimalServiceTest {
         assertEquals(expected.get(0).getColor(),actual.get(0).getColor());
         assertEquals(expected.get(0).getSex(),actual.get(0).getSex());
         assertEquals(expected.get(0).getSpecies(),actual.get(0).getSpecies());
-
-
         assertEquals(expected.size(),actual.size());
-
-
     }
-
 
     @Test
     public void addAnimals() throws Exception {
@@ -88,9 +77,7 @@ public class AnimalServiceTest {
                 new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
         when(animalRepository.saveAll(animalsEntities)).thenReturn(animalsEntities);
-
         List<AnimalDTO> actual = animalService.addAnimals(animalsDto);
-
         assertEquals(animalsDto, actual);
     }
 
@@ -110,25 +97,30 @@ public class AnimalServiceTest {
 
         when(animalRepository.findByShelternateId("1")).thenReturn(animalsEntities.get(0));
         when(animalRepository.findByShelternateId("2")).thenReturn(animalsEntities.get(1));
-
         when(adoptionRequestRepository.save(adoptionRequest)).thenReturn(adoptionRequest);
 
         List<String> shelterNetIds = List.of("1","2");
         CustomerRequest customerRequest = new CustomerRequest("customer", shelterNetIds);
-
         AdoptionRequestDTO actual = animalService.createAdoptionRequest(customerRequest);
-
-
         assertEquals(adoptionRequestDTO, actual);
         verify(animalRepository, times(2)).findByShelternateId(any());
-
     }
 
     @Test
     public void returnAnimalToShelter(){
-
         animalService.removeAnimals(List.of("101"));
         verify(animalRepository, times(1)).deleteAnimalByShelternateId("101");
+    }
 
+    @Test
+    public void getAnimalByShelterId(){
+        Animal animal=new Animal("101","cat1","CAT",
+                LocalDate.of(2015,03,23),"FEMALE","BLACK");
+        AnimalDTO animalDto=new AnimalDTO("101","cat1","CAT",
+                LocalDate.of(2015,03,23),"FEMALE","BLACK");
+        when(animalRepository.findByShelternateId("101")).thenReturn(animal);
+        AnimalDTO actual=animalService.getAnimal("101");
+        verify(animalRepository,times(1)).findByShelternateId("101");
+        assertEquals(animalDto,actual);
     }
 }

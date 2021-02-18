@@ -39,7 +39,6 @@ public class PetStoreRestDocs {
     @Autowired
     AnimalRepository animalRepository;
 
-
     @BeforeEach
     public void setUp(){
         mapper = new ObjectMapper();
@@ -67,10 +66,7 @@ public class PetStoreRestDocs {
                         fieldWithPath("[0].birthDate").description("BirthDate of the animal"),
                         fieldWithPath("[0].sex").description("Sex of the animal"),
                         fieldWithPath("[0].color").description("Color of the animal")
-
                 )));
-
-
     }
 
     @Test
@@ -110,7 +106,6 @@ public class PetStoreRestDocs {
         );
         animalRepository.saveAll(animalsEntities);
 
-
         mockMvc
                 .perform(get("/animals").contentType(MediaType.APPLICATION_JSON))
 
@@ -125,15 +120,11 @@ public class PetStoreRestDocs {
                         fieldWithPath("[].birthDate").description("BirthDate of the animal"),
                         fieldWithPath("[].sex").description("Sex of the animal"),
                         fieldWithPath("[].color").description("Color of the animal")
-
                 )));
-
     }
 
     @Test
     public void returnAnimalToShelter() throws Exception {
-
-
         List<Animal> animalsEntities = List.of(
                 new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
                 new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
@@ -147,6 +138,18 @@ public class PetStoreRestDocs {
                 .andDo(document("returnAnimalToShelter"));
     }
 
+    @Test
+    public void returnSickAnimalToShelter() throws Exception {
 
+        Animal animal1=new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK");
+        Animal animal2=new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN");
 
+        List<String> animalsIds = List.of("1","2");
+        animalRepository.saveAll(List.of(animal1,animal2));
+
+        mockMvc
+                .perform(delete("/sickanimal/?shelternateId=1&diagnosis=fever"))
+                        .andExpect(status().isOk())
+                .andDo(document("returnSickAnimalToShelter"));
+    }
 }
