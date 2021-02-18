@@ -75,7 +75,6 @@ public class PetStoreControllerTest {
                 new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
 
-
         List<Integer> animalsIds = List.of(1,2,3,4,5);
         MvcResult result = mockMvc
                 .perform(post("/animals").contentType(MediaType.APPLICATION_JSON)
@@ -98,15 +97,12 @@ public class PetStoreControllerTest {
        );
         AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer",animals);
 
-
-
         List<Animal> animalsEntities = List.of(
                 new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
                 new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
        );
         animalsEntities = animalRepository.saveAll(animalsEntities);
         List<String> shelterNetIds = List.of(animalsEntities.get(0).getShelternateId(),animalsEntities.get(1).getShelternateId());
-
 
         CustomerRequest customerRequest = new CustomerRequest("customer", shelterNetIds);
         MvcResult result = mockMvc
@@ -116,10 +112,8 @@ public class PetStoreControllerTest {
                 .andReturn();
 
         AdoptionRequestDTO actual = mapper.readValue(result.getResponse().getContentAsString(), AdoptionRequestDTO.class);
-
         assertEquals(adoptionRequest, actual);
     }
-
 
     @Test
     public void returnAnimalToShelter() throws Exception {
@@ -137,9 +131,6 @@ public class PetStoreControllerTest {
                 , "Male","Gold");
 
         animalRepository.saveAll(List.of(animal1,animal2,animal3,animal4,animal5));
-
-
-
 
         mockMvc.perform(delete("/animalreturns")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -164,12 +155,7 @@ public class PetStoreControllerTest {
 
         animalRepository.saveAll(List.of(animal1, animal2, animal3, animal4, animal5));
 
-
         mockMvc.perform(delete("/sickanimal/?shelternateId=101&diagnosis=fever"))
                 .andExpect(status().isOk());
-
-
     }
-
-
 }

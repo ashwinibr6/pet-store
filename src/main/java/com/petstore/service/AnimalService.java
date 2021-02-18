@@ -41,46 +41,34 @@ public class AnimalService {
                 adoptionRequest.getAnimals().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
         return new AdoptionRequestDTO(adoptionRequest.getClient(), animalDTOS);
     }
-    public AnimalDTO addAnimal(AnimalDTO animalDTO) {
-        Animal animal = animalRepository.save(mapTo(animalDTO));
-        return mapToDto(animal);
-    }
 
     public List<AnimalDTO> getAnimals() {
         return animalRepository.findAll().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
     }
 
     public List<AnimalDTO> addAnimals(List<AnimalDTO> animals) {
-
         List<Animal> animalList = animals.stream().map(animalDto -> mapTo(animalDto)).collect(Collectors.toList());
         animalList = animalRepository.saveAll(animalList);
         List<AnimalDTO> animalsDtos = animalList.stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
         return animalsDtos;
     }
 
-
     public AdoptionRequestDTO createAdoptionRequest(CustomerRequest customerRequest) {
-
         List<Animal> animals = customerRequest.getShelterNetIds()
                 .stream().map(id -> animalRepository.findByShelternateId(id))
                 .collect(Collectors.toList());
-
         AdoptionRequest adoptionRequest = new AdoptionRequest(customerRequest.getClient(), animals);
-
         return mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
-
     }
 
     public void removeAnimals(List<String> shelterIds) {
-        for (String id:shelterIds) {
+        for (String id : shelterIds) {
             animalRepository.deleteAnimalByShelternateId(id);
         }
-
     }
 
     public AnimalDTO getAnimal(String shelternateId) {
-        Animal animal=animalRepository.findByShelternateId(shelternateId);
-
+        Animal animal = animalRepository.findByShelternateId(shelternateId);
         return mapToDto(animal);
     }
 }

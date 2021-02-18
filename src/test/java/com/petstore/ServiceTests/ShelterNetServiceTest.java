@@ -50,22 +50,18 @@ public class ShelterNetServiceTest {
 //          .thenReturn(objectMapper.writeValueAsString(animalsDto));
 
         List<AnimalDTO> actual = shelterNetService.fetchAnimals(animalsIds);
-
         assertEquals(animalsDto, actual);
     }
 
     @Test
     public void retunAnimalToShelter(){
-
         List<String> animalsIds = List.of("1","2","3","4","5");
 
         /* To be uncommented once we get shelter end point*/
-//
         //when(restTemplate.patchForObject("/returnanimals", animalsIds, HttpStatus.class)).thenReturn(HttpStatus.OK);
 
         HttpStatus actual = shelterNetService.returnAnimalToShelter(animalsIds);
         assertEquals(HttpStatus.OK,actual);
-
     }
     @Test
     public void returnSickAnimalToShelter(){
@@ -73,6 +69,4 @@ public class ShelterNetServiceTest {
         HttpStatus actual=shelterNetService.returnSickAnimalToShelter("101","fever");
         assertEquals(HttpStatus.OK,actual);
     }
-
-
 }

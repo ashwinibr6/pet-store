@@ -29,7 +29,6 @@ public class Animal {
     private String sex;
     private String color;
 
-
     public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color) {
         this.shelternateId = shelternateId;
         this.animalName = animalName;
@@ -38,9 +37,6 @@ public class Animal {
         this.sex = sex;
         this.color = color;
     }
-
-
-
 
     @Override
     public boolean equals(Object o) {
