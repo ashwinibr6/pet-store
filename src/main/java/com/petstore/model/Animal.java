@@ -27,29 +27,19 @@ public class Animal {
     private LocalDate birthDate;
     private String sex;
     private String color;
-    private Boolean isSick;
-    private String diagnose;
-
-//    public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color) {
-//        this.shelternateId = shelternateId;
-//        this.animalName = animalName;
-//        this.species = species;
-//        this.birthDate = birthDate;
-//        this.sex = sex;
-//        this.color = color;
-//    }
 
 
-    public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color, Boolean isSick, String diagnose) {
+    public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color) {
         this.shelternateId = shelternateId;
         this.animalName = animalName;
         this.species = species;
         this.birthDate = birthDate;
         this.sex = sex;
         this.color = color;
-        this.isSick = isSick;
-        this.diagnose = diagnose;
     }
+
+
+
 
     @Override
     public boolean equals(Object o) {

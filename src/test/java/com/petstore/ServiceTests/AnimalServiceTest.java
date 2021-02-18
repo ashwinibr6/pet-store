@@ -9,21 +9,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import java.util.ArrayList;
-
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-
-
-import static org.mockito.Mockito.when;
 
 
 
@@ -41,10 +33,10 @@ public class AnimalServiceTest {
 
 
         Animal animal1=new Animal("101","Lion1","species", LocalDate.of(2015,12,27)
-                , "Male","Gold", false, null);
+                , "Male","Gold");
 
         Animal animal2=new Animal("102","Lion1","species", LocalDate.of(2015,12,27)
-                , "Male","Gold", false, null);
+                , "Male","Gold");
 
         List<Animal> expected=new ArrayList<>();
         expected.add(animal1);
@@ -74,19 +66,19 @@ public class AnimalServiceTest {
     @Test
     public void addAnimals() throws Exception {
         List<AnimalDTO> animalsDto = List.of(
-                new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null),
-                new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null),
-                new AnimalDTO(3l, "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",false, null),
-                new AnimalDTO(4l,"4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",false, null),
-                new AnimalDTO(5l, "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",false, null)
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
+                new AnimalDTO("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
+                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
+                new AnimalDTO("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
 
         List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null),
-                new Animal("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",false, null),
-                new Animal("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",false, null),
-                new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",false, null)
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
+                new Animal("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
+                new Animal("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
+                new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
         when(animalRepository.saveAll(animalsEntities)).thenReturn(animalsEntities);
 
@@ -101,5 +93,21 @@ public class AnimalServiceTest {
         animalService.removeAnimals(List.of("101"));
         verify(animalRepository, times(1)).deleteAnimalByShelternateId("101");
 
+    }
+
+    @Test
+    public void getAnimalByShelterId(){
+        Animal animal=new Animal("101","cat1","CAT",
+                LocalDate.of(2015,03,23),"FEMALE","BLACK");
+        AnimalDTO animalDto=new AnimalDTO("101","cat1","CAT",
+                LocalDate.of(2015,03,23),"FEMALE","BLACK");
+
+
+
+        when(animalRepository.findByShelternateId("101")).thenReturn(animal);
+        AnimalDTO actual=animalService.getAnimal("101");
+        verify(animalRepository,times(1)).findByShelternateId("101");
+
+        assertEquals(animalDto,actual);
     }
 }

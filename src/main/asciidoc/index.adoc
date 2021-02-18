@@ -30,3 +30,11 @@ include::{snippets}/returnAnimalToShelter/http-request.adoc[]
 
 .response
 include::{snippets}/returnAnimalToShelter/http-response.adoc[]
+
+
+== Return Sick Animal to Shelter
+.request
+include::{snippets}/returnSickAnimalToShelter/http-request.adoc[]
+
+.response
+include::{snippets}/returnSickAnimalToShelter/http-response.adoc[]

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +17,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ShelterNetServiceTest {
@@ -40,11 +38,11 @@ public class ShelterNetServiceTest {
     public void fetchAnimalsFromShelterNet() throws JsonProcessingException {
         List<Integer> animalsIds = List.of(1,2,3,4,5);
         List<AnimalDTO> animalsDto = List.of(
-                new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null),
-                new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null),
-                new AnimalDTO(3l, "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",false, null),
-                new AnimalDTO(4l,"4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",false, null),
-                new AnimalDTO(5l, "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",false, null)
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
+                new AnimalDTO("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
+                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
+                new AnimalDTO("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
 
 //        Mockito
@@ -69,5 +67,12 @@ public class ShelterNetServiceTest {
         assertEquals(HttpStatus.OK,actual);
 
     }
+    @Test
+    public void returnSickAnimalToShelter(){
+//        when(restTemplate.patchForObject("https://shelternet.herokuapp.com/?shelternateId=101","fever",HttpStatus.class)).thenReturn(HttpStatus.OK);
+        HttpStatus actual=shelterNetService.returnSickAnimalToShelter("101","fever");
+        assertEquals(HttpStatus.OK,actual);
+    }
+
 
 }

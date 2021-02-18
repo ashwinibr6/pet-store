@@ -1,9 +1,9 @@
 package com.petstore.RestDocs;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.model.Animal;
 import com.petstore.repository.AnimalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-
 import java.time.LocalDate;
 import java.util.List;
-
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -63,7 +61,6 @@ public class PetStoreRestDocs {
                         .content(mapper.writeValueAsString(animalsIds)))
                 .andExpect(status().isCreated())
                 .andDo(document("fetchAnimals", responseFields(
-                        fieldWithPath("[0].id").description("Id of the animal in pet store"),
                         fieldWithPath("[0].shelternateId").description("shelternateId of the animal"),
                         fieldWithPath("[0].animalName").description("Name of the animal"),
                         fieldWithPath("[0].species").description("Species of the animal"),
@@ -79,8 +76,8 @@ public class PetStoreRestDocs {
     @Test
     public void getAllAnimals() throws Exception {
 
-        AnimalDTO animalDTO1=new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null);
-        AnimalDTO animalDTo2=new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null);
+        AnimalDTO animalDTO1=new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK");
+        AnimalDTO animalDTo2=new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN");
 
 
         mockMvc
@@ -99,7 +96,6 @@ public class PetStoreRestDocs {
                 .andExpect(jsonPath("$.[0].species").value("CAT"))
                 .andExpect(jsonPath("$.[0].color").value("BLACK"))
                 .andDo(document("getAllAnimals", responseFields(
-                        fieldWithPath("[].id").description("Id of the animal in pet store"),
                         fieldWithPath("[].shelternateId").description("shelternateId of the animal"),
                         fieldWithPath("[].animalName").description("Name of the animal"),
                         fieldWithPath("[].species").description("Species of the animal"),
@@ -114,8 +110,8 @@ public class PetStoreRestDocs {
     @Test
     public void returnAnimalToShelter() throws Exception {
 
-        AnimalDTO animalDTO1=new AnimalDTO(1l,"1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",false, null);
-        AnimalDTO animalDTo2=new AnimalDTO(2l, "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",false, null);
+        AnimalDTO animalDTO1=new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK");
+        AnimalDTO animalDTo2=new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN");
 
         List<String> animalsIds = List.of("1","2");
 
@@ -133,6 +129,25 @@ public class PetStoreRestDocs {
                         .content(mapper.writeValueAsString(animalsIds))).andExpect(status().isOk())
                 .andDo(document("returnAnimalToShelter"));
     }
+
+
+    @Test
+    public void returnSickAnimalToShelter() throws Exception {
+
+        Animal animal1=new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK");
+        Animal animal2=new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN");
+
+        List<String> animalsIds = List.of("1","2");
+
+        animalRepository.saveAll(List.of(animal1,animal2));
+
+
+        mockMvc
+                .perform(delete("/sickanimal/?shelternateId=1&diagnosis=fever"))
+                        .andExpect(status().isOk())
+                .andDo(document("returnSickAnimalToShelter"));
+    }
+
 
 
 

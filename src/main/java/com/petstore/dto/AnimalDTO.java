@@ -16,7 +16,7 @@ import java.util.Objects;
 @NoArgsConstructor
 public class AnimalDTO {
 
-    private Long id;
+
     private String shelternateId;
     private String animalName;
     private String species;
@@ -27,8 +27,7 @@ public class AnimalDTO {
     private String sex;
     private String color;
 
-    private Boolean isSick;
-    private String diagnose;
+
 
     @Override
     public boolean equals(Object o) {

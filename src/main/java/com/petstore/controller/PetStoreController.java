@@ -2,19 +2,11 @@ package com.petstore.controller;
 
 import com.petstore.dto.AnimalDTO;
 import com.petstore.service.AnimalService;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.petstore.service.ShelterNetService;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/")
@@ -66,10 +58,16 @@ public class PetStoreController {
         }
     }
 
-    @DeleteMapping("/sickanimals")
+    @DeleteMapping("/sickanimal")
     @ResponseStatus(HttpStatus.OK)
-    public void  returnSickAnimalToShelter(){
-        returnAnimalToShelter(animalService.findSickAnimals());
+    public void  returnSickAnimalToShelter(@RequestParam String shelternateId, @RequestParam String diagnosis){
+        if(animalService.getAnimal(shelternateId)!=null){
+            HttpStatus status=shelterNetService.returnSickAnimalToShelter(shelternateId,diagnosis);
+            if(status.is2xxSuccessful()){
+                animalService.removeAnimals(List.of(shelternateId));
+            }
+        }
+
     }
 
 

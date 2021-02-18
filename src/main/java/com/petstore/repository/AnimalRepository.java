@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface AnimalRepository extends JpaRepository<Animal,Long> {
     void deleteAnimalByShelternateId(String shelterId);
-    List<Animal> findAllByIsSick(Boolean isSick);
+    Animal findByShelternateId(String shelterId);
 }
