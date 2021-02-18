@@ -17,7 +17,6 @@ public class ShelterNetService {
         this.restTemplate = restTemplate;
     }
 
-
     public List<AnimalDTO> fetchAnimals(List<Integer> animalsIds) {
         List<AnimalDTO> animalsDto = List.of(
                 new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
@@ -29,12 +28,17 @@ public class ShelterNetService {
         /* TO BE IMPLEMENTED */
       // String result = restTemplate.postForObject("http://localhost/add-comment", animalsIds, String.class);
        // List<AnimalDTO> actual = mapper.readValue(result, new TypeReference<List<AnimalDTO>>() {
-
         return animalsDto;
     }
 
     public HttpStatus returnAnimalToShelter(List<String> animalsIds) {
-        //HttpStatus status=restTemplate.patchForObject("https://shelternet.herokuapp.com/", animalsIds, HttpStatus.class);
+        //HttpStatus status=restTemplate.patchForObject("https://shelternet.herokuapp.com/?shelterId101=&diagnis=fever", animalsIds, HttpStatus.class);
+        //return status;
+        return HttpStatus.OK;
+    }
+
+    public HttpStatus returnSickAnimalToShelter(String shelternateId,String diagnosis) {
+//        HttpStatus status=restTemplate.patchForObject("https://shelternet.herokuapp.com/?shelternateId="+shelternateId,diagnosis,HttpStatus.class);
         //return status;
         return HttpStatus.OK;
     }

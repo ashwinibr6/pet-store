@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface AnimalRepository extends JpaRepository<Animal,Long> {
 
     Animal findByShelternateId(String shelternateId);
-
-    void deleteAnimalByShelternateId(String shelterId);
+    void deleteAnimalByShelternateId(String shelternateId);
 }
