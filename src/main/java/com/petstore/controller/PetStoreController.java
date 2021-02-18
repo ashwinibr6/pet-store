@@ -3,11 +3,14 @@ package com.petstore.controller;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.model.Animal;
 import com.petstore.service.AnimalService;
 import com.petstore.service.ShelterNetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -65,5 +68,17 @@ public class PetStoreController {
                 animalService.removeAnimals(List.of(shelternateId));
             }
         }
+    }
+
+    @PatchMapping("/bondedanimal")
+    @ResponseStatus(HttpStatus.OK)
+    public void bondAnimal(@RequestBody List<String> shelternateID){
+        animalService.bondAnimals(shelternateID);
+    }
+
+    @GetMapping("/animal/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public AnimalDTO getAnimal(@PathVariable String id){
+        return animalService.getAnimal(id);
     }
 }
