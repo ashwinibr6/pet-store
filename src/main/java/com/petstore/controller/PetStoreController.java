@@ -4,19 +4,11 @@ import com.petstore.POJO.CustomerRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.service.AnimalService;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.petstore.service.ShelterNetService;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/")
@@ -34,12 +26,6 @@ public class PetStoreController {
     @GetMapping("home")
     public String homePage(){
         return "Welcome to Pet Store";
-    }
-
-    @PostMapping("/animal")
-    @ResponseStatus(HttpStatus.CREATED)
-    public AnimalDTO addAnimal(@RequestBody AnimalDTO animalDTO){
-        return animalService.addAnimal(animalDTO);
     }
 
     @GetMapping("animals")

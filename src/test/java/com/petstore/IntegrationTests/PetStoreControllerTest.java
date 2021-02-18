@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import javax.transaction.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,7 +25,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.petstore.model.Animal;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -125,9 +123,6 @@ public class PetStoreControllerTest {
     }
 
 
-    //Given there are animals hosted in Pet Store
-    //When I return them back to Shelternet
-    //Then I no longer see them in my store
 
     @Test
     public void returnAnimalToShelter() throws Exception {

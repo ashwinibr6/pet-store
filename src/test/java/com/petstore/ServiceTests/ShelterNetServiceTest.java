@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +17,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ShelterNetServiceTest {
@@ -46,7 +44,7 @@ public class ShelterNetServiceTest {
                 new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
                 new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
-
+        /* To be uncommented once we get shelter end point*/
 //        Mockito
 //                .when(restTemplate.postForObject("http://localhost/add-comment", animalsIds, String.class))
 //          .thenReturn(objectMapper.writeValueAsString(animalsDto));
