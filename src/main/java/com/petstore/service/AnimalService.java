@@ -9,10 +9,12 @@ import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class AnimalService {
 
     private AnimalRepository animalRepository;
@@ -39,6 +41,10 @@ public class AnimalService {
                 adoptionRequest.getAnimals().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
         return new AdoptionRequestDTO(adoptionRequest.getClient(), animalDTOS);
     }
+    public AnimalDTO addAnimal(AnimalDTO animalDTO) {
+        Animal animal = animalRepository.save(mapTo(animalDTO));
+        return mapToDto(animal);
+    }
 
     public List<AnimalDTO> getAnimals() {
         return animalRepository.findAll().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
@@ -62,6 +68,13 @@ public class AnimalService {
         AdoptionRequest adoptionRequest = new AdoptionRequest(customerRequest.getClient(), animals);
 
         return mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
+
+    }
+
+    public void removeAnimals(List<String> shelterIds) {
+        for (String id:shelterIds) {
+            animalRepository.deleteAnimalByShelternateId(id);
+        }
 
     }
 }

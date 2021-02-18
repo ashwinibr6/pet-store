@@ -1,6 +1,7 @@
 package com.petstore.service;
 
 import com.petstore.dto.AnimalDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,5 +31,11 @@ public class ShelterNetService {
        // List<AnimalDTO> actual = mapper.readValue(result, new TypeReference<List<AnimalDTO>>() {
 
         return animalsDto;
+    }
+
+    public HttpStatus returnAnimalToShelter(List<String> animalsIds) {
+        //HttpStatus status=restTemplate.patchForObject("https://shelternet.herokuapp.com/", animalsIds, HttpStatus.class);
+        //return status;
+        return HttpStatus.OK;
     }
 }

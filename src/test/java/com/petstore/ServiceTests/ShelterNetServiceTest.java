@@ -11,12 +11,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ShelterNetServiceTest {
@@ -52,6 +54,20 @@ public class ShelterNetServiceTest {
         List<AnimalDTO> actual = shelterNetService.fetchAnimals(animalsIds);
 
         assertEquals(animalsDto, actual);
+    }
+
+    @Test
+    public void retunAnimalToShelter(){
+
+        List<String> animalsIds = List.of("1","2","3","4","5");
+
+        /* To be uncommented once we get shelter end point*/
+//
+        //when(restTemplate.patchForObject("/returnanimals", animalsIds, HttpStatus.class)).thenReturn(HttpStatus.OK);
+
+        HttpStatus actual = shelterNetService.returnAnimalToShelter(animalsIds);
+        assertEquals(HttpStatus.OK,actual);
+
     }
 
 }

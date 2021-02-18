@@ -17,13 +17,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import javax.transaction.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.petstore.model.Animal;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,8 +43,7 @@ public class PetStoreControllerTest {
 
 
     @BeforeEach
-    public  void setup(){
-
+    void setUp() {
         mapper =  new ObjectMapper();
     }
 
@@ -87,6 +89,7 @@ public class PetStoreControllerTest {
 
         List<AnimalDTO> actual = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<AnimalDTO>>() {
         });
+
         assertEquals(animals, actual);
     }
 
@@ -120,5 +123,39 @@ public class PetStoreControllerTest {
 
         assertEquals(adoptionRequest, actual);
     }
+
+
+    //Given there are animals hosted in Pet Store
+    //When I return them back to Shelternet
+    //Then I no longer see them in my store
+
+    @Test
+    public void returnAnimalToShelter() throws Exception {
+
+        Animal animal1= new Animal("101","Lion1","species",LocalDate.of(2015,12,27)
+                        , "Male","Gold");
+        Animal animal2=  new Animal("102","Monkey","species",LocalDate.of(2017,3,12)
+                        , "Female","Gold");
+        Animal animal3=     new Animal("103","Cat","species",LocalDate.of(2018,2,7)
+                        , "Male","Gold");
+        Animal animal4=    new Animal("104","Zebra","species",LocalDate.of(2020,1,1)
+                        , "Female","Gold");
+
+        Animal animal5=new Animal("101","Lion1","species",LocalDate.of(2015,10,27)
+                , "Male","Gold");
+
+        animalRepository.saveAll(List.of(animal1,animal2,animal3,animal4,animal5));
+
+
+
+
+        mockMvc.perform(delete("/animalreturns")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(List.of(animal1.getShelternateId(),animal2.getShelternateId()))))
+                .andExpect(status().isOk());
+
+    }
+
+
 
 }
