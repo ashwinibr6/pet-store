@@ -21,10 +21,10 @@ public class ShelterNetService {
     public List<AnimalDTO> fetchAnimals(List<Integer> animalsIds) {
         List<AnimalDTO> animalsDto = List.of(
                 new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
-                new AnimalDTO("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW" ),
-                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE" ),
-                new AnimalDTO("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN" )
+                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
+                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
+                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
+                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
         /* TO BE IMPLEMENTED */
       // String result = restTemplate.postForObject("http://localhost/add-comment", animalsIds, String.class);

@@ -1,19 +1,20 @@
 package com.petstore.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-//@EqualsAndHashCode
 @ToString
 @NoArgsConstructor
 public class Animal {

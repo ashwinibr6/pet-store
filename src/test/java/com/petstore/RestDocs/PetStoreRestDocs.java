@@ -2,7 +2,7 @@ package com.petstore.RestDocs;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.petstore.dto.AnimalDTO;
+import com.petstore.POJO.CustomerRequest;
 import com.petstore.model.Animal;
 import com.petstore.repository.AnimalRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs(outputDir = "build/target/snippets")
+@Transactional
 public class PetStoreRestDocs {
 
     @Autowired
@@ -41,8 +43,6 @@ public class PetStoreRestDocs {
     @BeforeEach
     public void setUp(){
         mapper = new ObjectMapper();
-        animalRepository.deleteAll();
-
     }
 
     @Test
@@ -76,17 +76,40 @@ public class PetStoreRestDocs {
     @Test
     public void getAllAnimals() throws Exception {
 
-        AnimalDTO animalDTO1=new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK");
-        AnimalDTO animalDTo2=new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN");
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+        );
+        animalsEntities = animalRepository.saveAll(animalsEntities);
+        List<String> shelterNetIds = List.of(animalsEntities.get(0).getShelternateId(),animalsEntities.get(1).getShelternateId());
 
 
+        CustomerRequest customerRequest = new CustomerRequest("customer", shelterNetIds);
         mockMvc
-                .perform(post("/animal").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(animalDTO1))).andExpect(status().isCreated());
+                .perform(post("/adopt").contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(customerRequest)))
+                .andExpect(status().isCreated())
+                .andDo(document("createAdoptAnimalRequest", responseFields(
+                        fieldWithPath("client").description("Name of the client"),
+                        fieldWithPath("animalDTOS.[0].shelternateId").description("shelternateId of the animal"),
+                        fieldWithPath("animalDTOS.[0].animalName").description("Name of the animal"),
+                        fieldWithPath("animalDTOS.[0].species").description("Species of the animal"),
+                        fieldWithPath("animalDTOS.[0].birthDate").description("BirthDate of the animal"),
+                        fieldWithPath("animalDTOS.[0].sex").description("Sex of the animal"),
+                        fieldWithPath("animalDTOS.[0].color").description("Color of the animal")
 
-        mockMvc
-                .perform(post("/animal").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(animalDTo2))).andExpect(status().isCreated());
+                )));
+    }
+
+    @Test
+    public void getAllAnimals() throws Exception {
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+        );
+        animalRepository.saveAll(animalsEntities);
+
 
         mockMvc
                 .perform(get("/animals").contentType(MediaType.APPLICATION_JSON))
@@ -110,19 +133,13 @@ public class PetStoreRestDocs {
     @Test
     public void returnAnimalToShelter() throws Exception {
 
-        AnimalDTO animalDTO1=new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK");
-        AnimalDTO animalDTo2=new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN");
 
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+        );
+        animalRepository.saveAll(animalsEntities);
         List<String> animalsIds = List.of("1","2");
-
-        mockMvc
-                .perform(post("/animal").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(animalDTO1))).andExpect(status().isCreated());
-
-        mockMvc
-                .perform(post("/animal").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(animalDTo2))).andExpect(status().isCreated());
-
 
         mockMvc
                 .perform(delete("/animalreturns").contentType(MediaType.APPLICATION_JSON)

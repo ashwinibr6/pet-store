@@ -1,5 +1,7 @@
 package com.petstore.controller;
 
+import com.petstore.POJO.CustomerRequest;
+import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.service.AnimalService;
 import com.petstore.service.ShelterNetService;
@@ -26,12 +28,6 @@ public class PetStoreController {
         return "Welcome to Pet Store";
     }
 
-    @PostMapping("/animal")
-    @ResponseStatus(HttpStatus.CREATED)
-    public AnimalDTO addAnimal(@RequestBody AnimalDTO animalDTO){
-        return animalService.addAnimal(animalDTO);
-    }
-
     @GetMapping("animals")
     @ResponseStatus(HttpStatus.OK)
     public List<AnimalDTO> getAllAnimals(){
@@ -40,12 +36,20 @@ public class PetStoreController {
 
 
 
-    @PostMapping("/animals")
+    @PostMapping("animals")
     @ResponseStatus(HttpStatus.CREATED)
     public List<AnimalDTO> addAnimals(@RequestBody List<Integer> animalIds){
 
         List<AnimalDTO> animals = shelterNetService.fetchAnimals(animalIds);
         return animalService.addAnimals(animals);
+    }
+
+    @PostMapping("adopt")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AdoptionRequestDTO adoptAnimals(@RequestBody CustomerRequest customerRequest){
+
+        return animalService.createAdoptionRequest(customerRequest);
+
     }
 
     @DeleteMapping("/animalreturns")

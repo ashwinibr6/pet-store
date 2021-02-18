@@ -1,7 +1,11 @@
 package com.petstore.ServiceTests;
 
+import com.petstore.POJO.CustomerRequest;
+import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
+import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import com.petstore.service.AnimalService;
 import org.junit.jupiter.api.Test;
@@ -24,6 +28,9 @@ public class AnimalServiceTest {
 
     @Mock
     AnimalRepository animalRepository;
+
+    @Mock
+    AdoptionRequestRepository adoptionRequestRepository;
 
     @InjectMocks
     AnimalService animalService;
@@ -67,10 +74,10 @@ public class AnimalServiceTest {
     public void addAnimals() throws Exception {
         List<AnimalDTO> animalsDto = List.of(
                 new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
-                new AnimalDTO("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
+                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
+                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
                 new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
-                new AnimalDTO("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
         );
 
         List<Animal> animalsEntities = List.of(
@@ -85,6 +92,36 @@ public class AnimalServiceTest {
         List<AnimalDTO> actual = animalService.addAnimals(animalsDto);
 
         assertEquals(animalsDto, actual);
+    }
+
+    @Test
+    public void createAdoptionRequest(){
+
+        List<AnimalDTO> animals = List.of(
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+        );
+        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals);
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+         );
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities);
+
+        when(animalRepository.findByShelternateId("1")).thenReturn(animalsEntities.get(0));
+        when(animalRepository.findByShelternateId("2")).thenReturn(animalsEntities.get(1));
+
+        when(adoptionRequestRepository.save(adoptionRequest)).thenReturn(adoptionRequest);
+
+        List<String> shelterNetIds = List.of("1","2");
+        CustomerRequest customerRequest = new CustomerRequest("customer", shelterNetIds);
+
+        AdoptionRequestDTO actual = animalService.createAdoptionRequest(customerRequest);
+
+
+        assertEquals(adoptionRequestDTO, actual);
+        verify(animalRepository, times(2)).findByShelternateId(any());
+
     }
 
     @Test
