@@ -78,19 +78,35 @@ public class AnimalService {
     public AdoptionRequestDTO manageRequest(Long id, ProcessAdoptionRequest processAdoptionRequest) {
 
         AdoptionRequest adoptionRequest = adoptionRequestRepository.getOne(id);
-        AdoptionRequestDTO adoptionRequestDTO = null;
+        AdoptionRequestDTO adoptionRequestDTO = mapToAdoptionRequestDto(adoptionRequest);
+        boolean allInseparable = true;
+
         if( adoptionRequest != null)
         {
-            adoptionRequest.setStatus(processAdoptionRequest.getStatus());
-            adoptionRequest.setComment(processAdoptionRequest.getComment());
-            adoptionRequestDTO = mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
 
-            if(adoptionRequest.getStatus().equals(Status.APPROVED.name())){
-                List<String> shelternetIds = adoptionRequest.getAnimals().stream()
-                        .map(animal -> animal.getShelternateId())
-                        .collect(Collectors.toList());
+            List<String> shelterNetIds = adoptionRequest.getAnimals().stream()
+                    .map(animal -> animal.getShelternateId())
+                    .collect(Collectors.toList());
+            for(Animal animal : adoptionRequest.getAnimals()){
+                if(animal.getBond().size() > 0)
+                {
+                    List<String> bond = animal.getBond();
+                     if(!shelterNetIds.containsAll(bond)) {
+                         allInseparable = false;
+                         break;
+                     }
+                }
 
-                removeAnimals(shelternetIds);
+            }
+
+            if(allInseparable) {
+                adoptionRequest.setStatus(processAdoptionRequest.getStatus());
+                adoptionRequest.setComment(processAdoptionRequest.getComment());
+                adoptionRequestDTO = mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
+
+                if (adoptionRequest.getStatus().equals(Status.APPROVED.name())) {
+                    removeAnimals(shelterNetIds);
+                }
             }
 
         }

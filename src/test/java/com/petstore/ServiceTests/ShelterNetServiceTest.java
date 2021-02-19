@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -77,9 +78,9 @@ public class ShelterNetServiceTest {
     public void notifyAnimalAdoption() throws JsonProcessingException {
         List<AnimalDTO> animals = List.of(
                 new AnimalDTO("1","cat1","CAT",
-                        LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                        LocalDate.of(2015,03,23),"FEMALE","BLACK",new ArrayList<>()),
                 new AnimalDTO("2","cat2","CAT",
-                        LocalDate.of(2016,03,23),"MALE","BROWN")
+                        LocalDate.of(2016,03,23),"MALE","BROWN",new ArrayList<>())
         );
         AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals, Status.APPROVED.name()
                 , "Approved, ready to be adopted");

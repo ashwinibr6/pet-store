@@ -131,13 +131,21 @@ public class AnimalServiceTest {
     public void approveAdoptionRequest(){
 
         List<AnimalDTO> animals = List.of(
-                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        List.of("2")),
+                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",
+                        List.of("1")),
+                new AnimalDTO("3","cat3","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                                new ArrayList<>())
         );
         AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals, Status.APPROVED.name(), "Approved, ready to be adopted");
         List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        List.of("2")),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",
+                        List.of("1")),
+                new Animal("3","cat3","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        new ArrayList<>())
         );
         AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.name());
         when(adoptionRequestRepository.getOne(any())).thenReturn(adoptionRequest);
@@ -146,7 +154,35 @@ public class AnimalServiceTest {
 
 
         AdoptionRequestDTO actual = animalService.manageRequest(1l, processRequest);
-        verify(animalRepository, times(2)).deleteAnimalByShelternateId(any());
+        verify(animalRepository, times(3)).deleteAnimalByShelternateId(any());
+
+        assertEquals(adoptionRequestDTO, actual);
+
+    }
+
+    @Test
+    public void approveAdoptionRequestNonSeparable(){
+
+        List<AnimalDTO> animals = List.of(
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        List.of("2")),
+                new AnimalDTO("3","cat3","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        new ArrayList<>())
+        );
+        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals, Status.PENDING.name(), "");
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        List.of("2")),
+                new Animal("3","cat3","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        new ArrayList<>())
+        );
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.name());
+        when(adoptionRequestRepository.getOne(any())).thenReturn(adoptionRequest);
+        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.PENDING.toString(), "");
+
+        AdoptionRequestDTO actual = animalService.manageRequest(1l, processRequest);
+        verify(animalRepository, times(0)).deleteAnimalByShelternateId(any());
+
         assertEquals(adoptionRequestDTO, actual);
 
     }
