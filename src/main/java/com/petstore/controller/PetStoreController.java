@@ -76,9 +76,9 @@ public class PetStoreController {
         animalService.bondAnimals(shelternateID);
     }
 
-    @GetMapping("/animal/{id}")
+    @GetMapping("/animal/{shelternateID}")
     @ResponseStatus(HttpStatus.OK)
-    public AnimalDTO getAnimal(@PathVariable String id){
-        return animalService.getAnimal(id);
+    public AnimalDTO getAnimal(@PathVariable String shelternateID){
+        return animalService.getAnimal(shelternateID);
     }
 }
