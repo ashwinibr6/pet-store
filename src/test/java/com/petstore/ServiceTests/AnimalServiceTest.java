@@ -1,6 +1,7 @@
 package com.petstore.ServiceTests;
 
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.model.AdoptionRequest;
@@ -89,7 +90,7 @@ public class AnimalServiceTest {
                 new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
                 new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
         );
-        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals, Status.PENDING.name());
+        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals, Status.PENDING.name(),"");
         List<Animal> animalsEntities = List.of(
                 new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
                 new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
@@ -123,5 +124,29 @@ public class AnimalServiceTest {
         AnimalDTO actual=animalService.getAnimal("101");
         verify(animalRepository,times(1)).findByShelternateId("101");
         assertEquals(animalDto,actual);
+    }
+
+    @Test
+    public void approveAdoptionRequest(){
+
+        List<AnimalDTO> animals = List.of(
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+        );
+        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals, Status.APPROVED.name(), "Approved, ready to be adopted");
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+        );
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.name());
+        when(adoptionRequestRepository.getOne(any())).thenReturn(adoptionRequest);
+        when(adoptionRequestRepository.save(adoptionRequest)).thenReturn(adoptionRequest);
+        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "Approved, ready to be adopted");
+
+
+        AdoptionRequestDTO actual = animalService.manageRequest(1l, processRequest);
+        verify(animalRepository, times(2)).deleteAnimalByShelternateId(any());
+        assertEquals(adoptionRequestDTO, actual);
+
     }
 }

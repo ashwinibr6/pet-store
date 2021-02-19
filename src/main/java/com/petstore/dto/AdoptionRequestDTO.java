@@ -17,5 +17,7 @@ public class AdoptionRequestDTO {
 
     private String status;
 
+    private String comment;
+
 
 }

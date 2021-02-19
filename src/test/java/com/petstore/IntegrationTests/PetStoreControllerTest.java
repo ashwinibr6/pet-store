@@ -3,6 +3,7 @@ package com.petstore.IntegrationTests;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
@@ -28,6 +29,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -102,7 +104,7 @@ public class PetStoreControllerTest {
                 new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
                 new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
        );
-        AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer",animals, Status.PENDING.toString());
+        AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer",animals, Status.PENDING.toString(),"");
 
         List<Animal> animalsEntities = List.of(
                 new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
@@ -181,12 +183,16 @@ public class PetStoreControllerTest {
         /* TO BE IMPLEMENTED */
        // If any inseparable pets are all part of the request AND
 
-        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "ready to be adopted");
+        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "Approved, ready to be adopted");
 
         mockMvc
                 .perform(put("/adopt/request/"+adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("adoptionRequestDTO.comment").value("Approved, ready to be adopted"))
+                .andExpect(jsonPath("adoptionRequestDTO.status").value("APPROVED"))
+                .andExpect(jsonPath("adoptionRequestDTO.client").value("customer"))
+                .andExpect(jsonPath("shelterNetNotificationStatus").value("OK"));
 
 
     }

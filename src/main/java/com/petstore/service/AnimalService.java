@@ -1,6 +1,7 @@
 package com.petstore.service;
 
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.model.AdoptionRequest;
@@ -40,7 +41,8 @@ public class AnimalService {
     private AdoptionRequestDTO mapToAdoptionRequestDto(AdoptionRequest adoptionRequest) {
         List<AnimalDTO> animalDTOS =
                 adoptionRequest.getAnimals().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
-        return new AdoptionRequestDTO(adoptionRequest.getClient(), animalDTOS, adoptionRequest.getStatus());
+        return new AdoptionRequestDTO(adoptionRequest.getClient(), animalDTOS, adoptionRequest.getStatus(),
+                adoptionRequest.getComment());
     }
 
     public List<AnimalDTO> getAnimals() {
@@ -71,5 +73,27 @@ public class AnimalService {
     public AnimalDTO getAnimal(String shelternateId) {
         Animal animal = animalRepository.findByShelternateId(shelternateId);
         return mapToDto(animal);
+    }
+
+    public AdoptionRequestDTO manageRequest(Long id, ProcessAdoptionRequest processAdoptionRequest) {
+
+        AdoptionRequest adoptionRequest = adoptionRequestRepository.getOne(id);
+        AdoptionRequestDTO adoptionRequestDTO = null;
+        if( adoptionRequest != null)
+        {
+            adoptionRequest.setStatus(processAdoptionRequest.getStatus());
+            adoptionRequest.setComment(processAdoptionRequest.getComment());
+            adoptionRequestDTO = mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
+
+            if(adoptionRequest.getStatus().equals(Status.APPROVED.name())){
+                List<String> shelternetIds = adoptionRequest.getAnimals().stream()
+                        .map(animal -> animal.getShelternateId())
+                        .collect(Collectors.toList());
+
+                removeAnimals(shelternetIds);
+            }
+
+        }
+        return adoptionRequestDTO;
     }
 }

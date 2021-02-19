@@ -1,6 +1,7 @@
 package com.petstore.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Getter
-
+@Setter
 public class AdoptionRequest {
 
     @Id
@@ -21,23 +22,34 @@ public class AdoptionRequest {
     private List<Animal> animals ;
 
     private String status;
+    private String comment;
 
     public AdoptionRequest(String client, List<Animal> animals, String status) {
         this.client = client;
         this.animals = animals;
         this.status = status;
+        this.comment = "";
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         AdoptionRequest that = (AdoptionRequest) o;
-        return Objects.equals(client, that.client) && Objects.equals(animals, that.animals) && Objects.equals(status, that.status);
+
+        if (!client.equals(that.client)) return false;
+        if (!animals.equals(that.animals)) return false;
+        if (!status.equals(that.status)) return false;
+        return comment != null ? comment.equals(that.comment) : that.comment == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(client, animals, status);
+        int result = client.hashCode();
+        result = 31 * result + animals.hashCode();
+        result = 31 * result + status.hashCode();
+        result = 31 * result + (comment != null ? comment.hashCode() : 0);
+        return result;
     }
 }

@@ -1,5 +1,6 @@
 package com.petstore.service;
 
+import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,13 @@ public class ShelterNetService {
     public HttpStatus returnSickAnimalToShelter(String shelternateId,String diagnosis) {
 //        HttpStatus status=restTemplate.patchForObject("https://shelternet.herokuapp.com/?shelternateId="+shelternateId,diagnosis,HttpStatus.class);
         //return status;
+        return HttpStatus.OK;
+    }
+
+    public HttpStatus notifyAnimalAdoption(AdoptionRequestDTO adoptionRequestDTO) {
+//        HttpStatus status=restTemplate.postForObject("http://localhost/add-comment",
+//                adoptionRequestDTO, HttpStatus.class);
+//        return status;
         return HttpStatus.OK;
     }
 }

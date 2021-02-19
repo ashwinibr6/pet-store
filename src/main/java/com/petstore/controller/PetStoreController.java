@@ -1,14 +1,18 @@
 package com.petstore.controller;
 
+import com.petstore.POJO.AdoptionResponse;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.model.AdoptionRequest;
+import com.petstore.model.Status;
 import com.petstore.service.AnimalService;
 import com.petstore.service.ShelterNetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -70,7 +74,16 @@ public class PetStoreController {
 
     @PutMapping("adopt/request/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void processAdoptionRequest(@PathVariable Long id, @RequestBody ProcessAdoptionRequest processAdoptionRequest) {
+    public AdoptionResponse processAdoptionRequest(@PathVariable Long id, @RequestBody ProcessAdoptionRequest processAdoptionRequest) {
+        HttpStatus shelterNetNotificationStatus = null;
+        AdoptionRequestDTO adoptionRequestDTO = animalService.manageRequest(id, processAdoptionRequest);
 
+        if(adoptionRequestDTO != null
+                && adoptionRequestDTO.getStatus().equals(Status.APPROVED.name()))
+            shelterNetNotificationStatus = shelterNetService.notifyAnimalAdoption(adoptionRequestDTO);
+
+        AdoptionResponse adoptionResponse = new AdoptionResponse(shelterNetNotificationStatus, adoptionRequestDTO);
+
+        return adoptionResponse;
     }
 }
