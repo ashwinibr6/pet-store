@@ -2,12 +2,16 @@ package com.petstore.service;
 
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.dto.AnimalReturnDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ShelterNetService {
@@ -33,13 +37,15 @@ public class ShelterNetService {
     }
 
     public HttpStatus returnAnimalToShelter(List<String> animalsIds) {
-        //HttpStatus status=restTemplate.patchForObject("https://shelternet.herokuapp.com/?shelterId101=&diagnis=fever", animalsIds, HttpStatus.class);
+        List<AnimalReturnDto> animals=animalsIds.stream().map(id->new AnimalReturnDto(id,"")).collect(Collectors.toList());
+        //HttpStatus status=restTemplate.postForObject("https://shelternet.herokuapp.com/animals/return", animals, HttpStatus.class);
         //return status;
         return HttpStatus.OK;
     }
 
     public HttpStatus returnSickAnimalToShelter(String shelternateId,String diagnosis) {
-//        HttpStatus status=restTemplate.patchForObject("https://shelternet.herokuapp.com/?shelternateId="+shelternateId,diagnosis,HttpStatus.class);
+        List<AnimalReturnDto> animals=Arrays.asList(new AnimalReturnDto(shelternateId,diagnosis));
+//        HttpStatus status=restTemplate.patchForObject("https://shelternet.herokuapp.com/animals/return",animals,HttpStatus.class);
         //return status;
         return HttpStatus.OK;
     }
