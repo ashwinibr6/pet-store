@@ -1,10 +1,12 @@
 package com.petstore.service;
 
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
+import com.petstore.model.Status;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,8 @@ public class AnimalService {
     private AdoptionRequestDTO mapToAdoptionRequestDto(AdoptionRequest adoptionRequest) {
         List<AnimalDTO> animalDTOS =
                 adoptionRequest.getAnimals().stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
-        return new AdoptionRequestDTO(adoptionRequest.getClient(), animalDTOS);
+        return new AdoptionRequestDTO(adoptionRequest.getClient(), animalDTOS, adoptionRequest.getStatus(),
+                adoptionRequest.getComment());
     }
 
     public List<AnimalDTO> getAnimals() {
@@ -57,7 +60,7 @@ public class AnimalService {
         List<Animal> animals = customerRequest.getShelterNetIds()
                 .stream().map(id -> animalRepository.findByShelternateId(id))
                 .collect(Collectors.toList());
-        AdoptionRequest adoptionRequest = new AdoptionRequest(customerRequest.getClient(), animals);
+        AdoptionRequest adoptionRequest = new AdoptionRequest(customerRequest.getClient(), animals, Status.PENDING.name());
         return mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
     }
 
@@ -70,6 +73,44 @@ public class AnimalService {
     public AnimalDTO getAnimal(String shelternateId) {
         Animal animal = animalRepository.findByShelternateId(shelternateId);
         return mapToDto(animal);
+    }
+
+    public AdoptionRequestDTO manageRequest(Long id, ProcessAdoptionRequest processAdoptionRequest) {
+
+        AdoptionRequest adoptionRequest = adoptionRequestRepository.getOne(id);
+        AdoptionRequestDTO adoptionRequestDTO = mapToAdoptionRequestDto(adoptionRequest);
+        boolean allInseparable = true;
+
+        if( adoptionRequest != null)
+        {
+
+            List<String> shelterNetIds = adoptionRequest.getAnimals().stream()
+                    .map(animal -> animal.getShelternateId())
+                    .collect(Collectors.toList());
+            for(Animal animal : adoptionRequest.getAnimals()){
+                if(animal.getBond().size() > 0)
+                {
+                    List<String> bond = animal.getBond();
+                     if(!shelterNetIds.containsAll(bond)) {
+                         allInseparable = false;
+                         break;
+                     }
+                }
+
+            }
+
+            if(allInseparable) {
+                adoptionRequest.setStatus(processAdoptionRequest.getStatus());
+                adoptionRequest.setComment(processAdoptionRequest.getComment());
+                adoptionRequestDTO = mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
+
+                if (adoptionRequest.getStatus().equals(Status.APPROVED.name())) {
+                    removeAnimals(shelterNetIds);
+                }
+            }
+
+        }
+        return adoptionRequestDTO;
     }
 
     public void bondAnimals(List<String> bond) {
