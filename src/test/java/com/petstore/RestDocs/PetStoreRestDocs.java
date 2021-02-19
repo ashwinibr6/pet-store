@@ -196,10 +196,5 @@ public class PetStoreRestDocs {
                 fieldWithPath("sex").description("Sex of the animal"),
                 fieldWithPath("color").description("Color of the animal"),
                 fieldWithPath("bond.[]").description("Bond of the animal"))));
-
-
     }
-
-
-
 }
