@@ -60,3 +60,24 @@ include::{snippets}/getAnimal/http-request.adoc[]
 
 .response
 include::{snippets}/getAnimal/http-response.adoc[]
+
+== Approve animal adoption request
+.request
+include::{snippets}/ApproveAdoptionRequest/http-request.adoc[]
+
+.response
+include::{snippets}/ApproveAdoptionRequest/http-response.adoc[]
+
+== Deny animal adoption request for Inseparable animals
+.request
+include::{snippets}/DenyInSeparableAdoptionRequest/http-request.adoc[]
+
+.response
+include::{snippets}/DenyInSeparableAdoptionRequest/http-response.adoc[]
+
+== Deny animal adoption request for Non-separable animals
+.request
+include::{snippets}/DenyNonSeparableAdoptionRequest/http-request.adoc[]
+
+.response
+include::{snippets}/DenyNonSeparableAdoptionRequest/http-response.adoc[]

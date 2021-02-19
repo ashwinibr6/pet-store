@@ -1,5 +1,5 @@
 package com.petstore.model;
 
 public enum Status {
-    PENDING, APPROVED
+    PENDING, APPROVED, DENIED
 }

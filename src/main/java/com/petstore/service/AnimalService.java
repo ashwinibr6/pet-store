@@ -107,6 +107,10 @@ public class AnimalService {
                 if (adoptionRequest.getStatus().equals(Status.APPROVED.name())) {
                     removeAnimals(shelterNetIds);
                 }
+            }else{
+                adoptionRequest.setStatus(Status.DENIED.name());
+                adoptionRequest.setComment("Denied, Can't be adopted");
+                adoptionRequestDTO = mapToAdoptionRequestDto(adoptionRequestRepository.save(adoptionRequest));
             }
 
         }

@@ -1,7 +1,6 @@
 package com.petstore.RestDocs;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
@@ -27,7 +26,8 @@ import java.util.List;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -240,6 +240,81 @@ public class PetStoreRestDocs {
                 fieldWithPath("adoptionRequestDTO.animalDTOS.[0].sex").description("Sex of the animal"),
                 fieldWithPath("adoptionRequestDTO.animalDTOS.[0].color").description("Color of the animal"),
                 fieldWithPath("adoptionRequestDTO.animalDTOS.[0].bond").description("Bond of the animal"),
+                        fieldWithPath("shelterNetNotificationStatus").description("ShelterNet Notification Status"))));
+
+
+    }
+
+    @Test
+    public void denyAdoptionRequestInSeparable() throws Exception {
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        List.of("2")),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",
+                        List.of("1")),
+                new Animal("3","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
+        );
+        animalsEntities = animalRepository.saveAll(animalsEntities);
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.toString());
+        adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
+
+        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
+
+        mockMvc
+                .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(processRequest)))
+                .andExpect(status().isAccepted())
+                .andDo(document("DenyInSeparableAdoptionRequest",pathParameters(
+                        parameterWithName("id").description("The adoption request ID")),responseFields(
+                        fieldWithPath("adoptionRequestDTO.comment").description("The comment of the request approval"),
+                        fieldWithPath("adoptionRequestDTO.status").description("The status of the request"),
+                        fieldWithPath("adoptionRequestDTO.client").description("The client details"),
+
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].shelternateId").description("shelternateId of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].animalName").description("Name of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].species").description("Species of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].birthDate").description("BirthDate of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].sex").description("Sex of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].color").description("Color of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].bond").description("Bond of the animal"),
+                        fieldWithPath("shelterNetNotificationStatus").description("ShelterNet Notification Status"))));
+
+
+    }
+
+
+    @Test
+    public void denyAdoptionRequestNonSeparable() throws Exception {
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        List.of("2")),
+                new Animal("3","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
+        );
+        animalsEntities = animalRepository.saveAll(animalsEntities);
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.toString());
+        adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
+
+        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
+
+        mockMvc
+                .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(processRequest)))
+                .andExpect(status().isAccepted())
+                .andDo(document("DenyNonSeparableAdoptionRequest",pathParameters(
+                        parameterWithName("id").description("The adoption request ID")),responseFields(
+                        fieldWithPath("adoptionRequestDTO.comment").description("The comment of the request approval"),
+                        fieldWithPath("adoptionRequestDTO.status").description("The status of the request"),
+                        fieldWithPath("adoptionRequestDTO.client").description("The client details"),
+
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].shelternateId").description("shelternateId of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].animalName").description("Name of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].species").description("Species of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].birthDate").description("BirthDate of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].sex").description("Sex of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].color").description("Color of the animal"),
+                        fieldWithPath("adoptionRequestDTO.animalDTOS.[0].bond").description("Bond of the animal"),
                         fieldWithPath("shelterNetNotificationStatus").description("ShelterNet Notification Status"))));
 
 

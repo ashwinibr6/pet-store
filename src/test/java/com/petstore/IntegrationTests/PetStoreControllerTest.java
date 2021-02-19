@@ -235,4 +235,59 @@ public class PetStoreControllerTest {
 
 
     }
+
+    @Test
+    public void denyAdoptionRequestInSeparable() throws Exception {
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        List.of("2")),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",
+                        List.of("1")),
+                new Animal("3","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
+        );
+        animalsEntities = animalRepository.saveAll(animalsEntities);
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.toString());
+        adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
+
+        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
+
+        mockMvc
+                .perform(put("/adopt/request/"+adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(processRequest)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("adoptionRequestDTO.comment").value("Denied, Can't be adopted"))
+                .andExpect(jsonPath("adoptionRequestDTO.status").value("DENIED"))
+                .andExpect(jsonPath("adoptionRequestDTO.client").value("customer"))
+                .andExpect(jsonPath("shelterNetNotificationStatus").doesNotExist());
+
+
+    }
+
+
+    @Test
+    public void denyAdoptionRequestNonSeparable() throws Exception {
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        List.of("2")),
+                new Animal("3","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
+        );
+        animalsEntities = animalRepository.saveAll(animalsEntities);
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.toString());
+        adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
+
+        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
+
+        mockMvc
+                .perform(put("/adopt/request/"+adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(processRequest)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("adoptionRequestDTO.comment").value("Denied, Can't be adopted"))
+                .andExpect(jsonPath("adoptionRequestDTO.status").value("DENIED"))
+                .andExpect(jsonPath("adoptionRequestDTO.client").value("customer"))
+                .andExpect(jsonPath("shelterNetNotificationStatus").doesNotExist());
+
+
+    }
 }
