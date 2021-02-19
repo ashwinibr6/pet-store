@@ -5,11 +5,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -28,14 +27,18 @@ public class Animal {
     private LocalDate birthDate;
     private String sex;
     private String color;
+    @ElementCollection
+    private List<String> bond;
 
-    public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color) {
+    public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color,List<String> bond) {
         this.shelternateId = shelternateId;
         this.animalName = animalName;
         this.species = species;
         this.birthDate = birthDate;
         this.sex = sex;
         this.color = color;
+        if(bond==null) bond=new ArrayList<>();
+        this.bond= new ArrayList<>(bond);
     }
 
     @Override

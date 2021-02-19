@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,10 +38,10 @@ public class AnimalServiceTest {
     public void getAllAnimals(){
 
         Animal animal1=new Animal("101","Lion1","species", LocalDate.of(2015,12,27)
-                , "Male","Gold");
+                , "Male","Gold", new ArrayList<>());
 
         Animal animal2=new Animal("102","Lion1","species", LocalDate.of(2015,12,27)
-                , "Male","Gold");
+                , "Male","Gold", new ArrayList<>());
 
         List<Animal> expected=new ArrayList<>();
         expected.add(animal1);
@@ -62,19 +63,19 @@ public class AnimalServiceTest {
     @Test
     public void addAnimals() throws Exception {
         List<AnimalDTO> animalsDto = List.of(
-                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
-                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
-                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
-                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",new ArrayList<>()),
+                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",new ArrayList<>()),
+                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",new ArrayList<>()),
+                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",new ArrayList<>()),
+                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",new ArrayList<>())
         );
 
         List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
-                new Animal("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
-                new Animal("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
-                new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>()),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>()),
+                new Animal("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW", new ArrayList<>()),
+                new Animal("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE", new ArrayList<>()),
+                new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN", new ArrayList<>())
         );
         when(animalRepository.saveAll(animalsEntities)).thenReturn(animalsEntities);
         List<AnimalDTO> actual = animalService.addAnimals(animalsDto);
@@ -85,13 +86,13 @@ public class AnimalServiceTest {
     public void createAdoptionRequest(){
 
         List<AnimalDTO> animals = List.of(
-                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",new ArrayList<>()),
+                new AnimalDTO("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",new ArrayList<>())
         );
         AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals);
         List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>()),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
          );
         AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities);
 
@@ -115,12 +116,34 @@ public class AnimalServiceTest {
     @Test
     public void getAnimalByShelterId(){
         Animal animal=new Animal("101","cat1","CAT",
-                LocalDate.of(2015,03,23),"FEMALE","BLACK");
+                LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>());
         AnimalDTO animalDto=new AnimalDTO("101","cat1","CAT",
-                LocalDate.of(2015,03,23),"FEMALE","BLACK");
+                LocalDate.of(2015,03,23),"FEMALE","BLACK",new ArrayList<>());
         when(animalRepository.findByShelternateId("101")).thenReturn(animal);
         AnimalDTO actual=animalService.getAnimal("101");
         verify(animalRepository,times(1)).findByShelternateId("101");
         assertEquals(animalDto,actual);
+    }
+
+    @Test
+    public void bondAnimal(){
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>()),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>()),
+                new Animal("3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW", new ArrayList<>()),
+                new Animal("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE", new ArrayList<>()),
+                new Animal("5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN", new ArrayList<>())
+        );
+
+
+        when(animalRepository.findByShelternateId("1")).thenReturn(animalsEntities.get(0));
+        when(animalRepository.findByShelternateId("2")).thenReturn(animalsEntities.get(1));
+        when(animalRepository.findByShelternateId("3")).thenReturn(animalsEntities.get(2));
+
+        animalService.bondAnimals(Arrays.asList("1","2","3"));
+        AnimalDTO actual=animalService.getAnimal("1");
+        assertEquals(List.of("2","3"),actual.getBond());
+
     }
 }
