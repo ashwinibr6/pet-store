@@ -30,12 +30,12 @@ public class AnimalService {
 
     private Animal mapTo(AnimalDTO animalDTO) {
         return new Animal(animalDTO.getShelternateId(), animalDTO.getAnimalName(), animalDTO.getSpecies(),
-                animalDTO.getBirthDate(), animalDTO.getSex(), animalDTO.getColor());
+                animalDTO.getBirthDate(), animalDTO.getSex(), animalDTO.getColor(), animalDTO.getBond());
     }
 
     private AnimalDTO mapToDto(Animal animal) {
         return new AnimalDTO(animal.getShelternateId(), animal.getAnimalName(), animal.getSpecies(),
-                animal.getBirthDate(), animal.getSex(), animal.getColor());
+                animal.getBirthDate(), animal.getSex(), animal.getColor(),animal.getBond());
     }
 
     private AdoptionRequestDTO mapToAdoptionRequestDto(AdoptionRequest adoptionRequest) {
@@ -95,5 +95,14 @@ public class AnimalService {
 
         }
         return adoptionRequestDTO;
+    }
+
+    public void bondAnimals(List<String> bond) {
+        for (String id:bond){
+            Animal animal=animalRepository.findByShelternateId(id);
+            animal.setBond(bond.stream().filter(shelterId->!shelterId.equals(id)).collect(Collectors.toList()));
+            animalRepository.save(animal);
+        }
+
     }
 }

@@ -7,12 +7,14 @@ import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Status;
+import com.petstore.model.Animal;
 import com.petstore.service.AnimalService;
 import com.petstore.service.ShelterNetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -85,5 +87,17 @@ public class PetStoreController {
         AdoptionResponse adoptionResponse = new AdoptionResponse(shelterNetNotificationStatus, adoptionRequestDTO);
 
         return adoptionResponse;
+    }
+
+    @PatchMapping("/bondedanimal")
+    @ResponseStatus(HttpStatus.OK)
+    public void bondAnimal(@RequestBody List<String> shelternateID){
+        animalService.bondAnimals(shelternateID);
+    }
+
+    @GetMapping("/animal/{shelternateID}")
+    @ResponseStatus(HttpStatus.OK)
+    public AnimalDTO getAnimal(@PathVariable String shelternateID){
+        return animalService.getAnimal(shelternateID);
     }
 }
