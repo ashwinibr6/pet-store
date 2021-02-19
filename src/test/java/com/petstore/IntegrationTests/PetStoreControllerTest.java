@@ -3,9 +3,13 @@ package com.petstore.IntegrationTests;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
+import com.petstore.model.Status;
+import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +28,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,6 +42,9 @@ public class PetStoreControllerTest {
 
     @Autowired
     AnimalRepository animalRepository;
+
+    @Autowired
+    AdoptionRequestRepository adoptionRequestRepository;
 
     ObjectMapper mapper;
 
@@ -98,7 +104,7 @@ public class PetStoreControllerTest {
                 new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",new ArrayList<>()),
                 new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",new ArrayList<>())
        );
-        AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer",animals);
+        AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer",animals, Status.PENDING.toString(),"");
 
         List<Animal> animalsEntities = List.of(
                 new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>()),
@@ -160,6 +166,34 @@ public class PetStoreControllerTest {
 
         mockMvc.perform(delete("/sickanimal/?shelternateId=101&diagnosis=fever"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void approveAdoptionRequest() throws Exception {
+
+        List<Animal> animalsEntities = List.of(
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
+                        List.of("2")),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",
+                        List.of("1")),
+                new Animal("3","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
+        );
+        animalsEntities = animalRepository.saveAll(animalsEntities);
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.toString());
+        adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
+
+        ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "Approved, ready to be adopted");
+
+        mockMvc
+                .perform(put("/adopt/request/"+adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(processRequest)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("adoptionRequestDTO.comment").value("Approved, ready to be adopted"))
+                .andExpect(jsonPath("adoptionRequestDTO.status").value("APPROVED"))
+                .andExpect(jsonPath("adoptionRequestDTO.client").value("customer"))
+                .andExpect(jsonPath("shelterNetNotificationStatus").value("OK"));
+
+
     }
 
     @Test
