@@ -1,6 +1,7 @@
 package com.petstore.RestDocs;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.model.Animal;
@@ -12,15 +13,19 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,7 +70,8 @@ public class PetStoreRestDocs {
                         fieldWithPath("[0].species").description("Species of the animal"),
                         fieldWithPath("[0].birthDate").description("BirthDate of the animal"),
                         fieldWithPath("[0].sex").description("Sex of the animal"),
-                        fieldWithPath("[0].color").description("Color of the animal")
+                        fieldWithPath("[0].color").description("Color of the animal"),
+                        fieldWithPath("[0].bond").description("Bond of the animal")
                 )));
     }
 
@@ -73,8 +79,8 @@ public class PetStoreRestDocs {
     public void createAdoptAnimalRequest() throws Exception {
 
         List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>()),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
         );
         animalsEntities = animalRepository.saveAll(animalsEntities);
         List<String> shelterNetIds = List.of(animalsEntities.get(0).getShelternateId(),animalsEntities.get(1).getShelternateId());
@@ -92,7 +98,8 @@ public class PetStoreRestDocs {
                         fieldWithPath("animalDTOS.[0].species").description("Species of the animal"),
                         fieldWithPath("animalDTOS.[0].birthDate").description("BirthDate of the animal"),
                         fieldWithPath("animalDTOS.[0].sex").description("Sex of the animal"),
-                        fieldWithPath("animalDTOS.[0].color").description("Color of the animal")
+                        fieldWithPath("animalDTOS.[0].color").description("Color of the animal"),
+                        fieldWithPath("animalDTOS.[0].bond").description("Bond of the animal")
 
                 )));
     }
@@ -101,8 +108,8 @@ public class PetStoreRestDocs {
     public void getAllAnimals() throws Exception {
 
         List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>()),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
         );
         animalRepository.saveAll(animalsEntities);
 
@@ -119,15 +126,16 @@ public class PetStoreRestDocs {
                         fieldWithPath("[].species").description("Species of the animal"),
                         fieldWithPath("[].birthDate").description("BirthDate of the animal"),
                         fieldWithPath("[].sex").description("Sex of the animal"),
-                        fieldWithPath("[].color").description("Color of the animal")
+                        fieldWithPath("[].color").description("Color of the animal"),
+                        fieldWithPath("[].bond").description("Bond of the animal")
                 )));
     }
 
     @Test
     public void returnAnimalToShelter() throws Exception {
         List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN")
+                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>()),
+                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
         );
         animalRepository.saveAll(animalsEntities);
         List<String> animalsIds = List.of("1","2");
@@ -141,8 +149,8 @@ public class PetStoreRestDocs {
     @Test
     public void returnSickAnimalToShelter() throws Exception {
 
-        Animal animal1=new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK");
-        Animal animal2=new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN");
+        Animal animal1=new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>());
+        Animal animal2=new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>());
 
         List<String> animalsIds = List.of("1","2");
         animalRepository.saveAll(List.of(animal1,animal2));
@@ -152,4 +160,46 @@ public class PetStoreRestDocs {
                         .andExpect(status().isOk())
                 .andDo(document("returnSickAnimalToShelter"));
     }
+    @Test
+    public void bondAnimal() throws Exception {
+
+        Animal animal1 = new Animal("1", "Lion1", "species", LocalDate.of(2015, 12, 27)
+                , "Male", "Gold", new ArrayList<>());
+        Animal animal2 = new Animal("2", "Monkey", "species", LocalDate.of(2017, 3, 12)
+                , "Female", "Gold", new ArrayList<>());
+        Animal animal3 = new Animal("3", "Cat", "species", LocalDate.of(2018, 2, 7)
+                , "Male", "Gold", new ArrayList<>());
+        Animal animal4 = new Animal("4", "Zebra", "species", LocalDate.of(2020, 1, 1)
+                , "Female", "Gold", new ArrayList<>());
+
+        Animal animal5 = new Animal("5", "Lion1", "species", LocalDate.of(2015, 10, 27)
+                , "Male", "Gold", new ArrayList<>());
+
+        animalRepository.saveAll(List.of(animal1, animal2, animal3, animal4, animal5));
+
+        mockMvc.perform(patch("/bondedanimal")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(List.of(1,2,3))))
+                .andExpect(status().isOk()).andDo(document("bondedanimal"));
+    }
+    @Test
+    public void getAnimal() throws Exception {
+        Animal animal1 = new Animal("1", "Lion1", "species", LocalDate.of(2015, 12, 27)
+                , "Male", "Gold", new ArrayList<>());
+        animalRepository.save(animal1);
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/animal/{shelternateID}",animal1.getShelternateId())).andExpect(status().isOk()).andDo(document("getAnimal",pathParameters(
+                parameterWithName("shelternateID").description("The shelter id of the animal")),responseFields(
+                fieldWithPath("shelternateId").description("shelternateId of the animal"),
+                fieldWithPath("animalName").description("Name of the animal"),
+                fieldWithPath("species").description("Species of the animal"),
+                fieldWithPath("birthDate").description("BirthDate of the animal"),
+                fieldWithPath("sex").description("Sex of the animal"),
+                fieldWithPath("color").description("Color of the animal"),
+                fieldWithPath("bond.[]").description("Bond of the animal"))));
+
+
+    }
+
+
+
 }

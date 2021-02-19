@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -25,4 +27,6 @@ public class AnimalDTO {
     private LocalDate birthDate;
     private String sex;
     private String color;
+    private List<String> bond=new ArrayList<>();
+
 }
