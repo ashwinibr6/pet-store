@@ -39,8 +39,9 @@ public class AnimalService {
                 animalDTO.getBirthDate(), animalDTO.getSex(), animalDTO.getColor(), animalDTO.getBond());
     }
     private StoreItemDTO storeItemToDto(StoreItem storeItem) {
-        return new StoreItemDTO(storeItem.getSku(),storeItem.getItemCategory(),storeItem.getAnimalType(),storeItem.getBrand(),storeItem.getName(),storeItem.getDescription(),
-                storeItem.getPrice()
+        return new StoreItemDTO(storeItem.getSku(),storeItem.getItemCategory(),storeItem.getAnimalType(),
+                storeItem.getBrand(),storeItem.getName(),storeItem.getDescription(),
+                storeItem.getPrice(), storeItem.getQuantity()
           );
     }
 
@@ -138,6 +139,13 @@ public class AnimalService {
     }
 
     public StoreItemDTO carryItem(StoreItem storeItem) {
+        return storeItemToDto( storeItemRepository.save(storeItem));
+
+    }
+
+    public StoreItemDTO addItemQuantity(long itemId, int itemQuantity) {
+        StoreItem storeItem = storeItemRepository.getOne(itemId);
+        storeItem.setQuantity(storeItem.getQuantity() + itemQuantity);
         return storeItemToDto( storeItemRepository.save(storeItem));
 
     }

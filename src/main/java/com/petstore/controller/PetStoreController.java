@@ -6,6 +6,8 @@ import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.StoreItemDTO;
+import com.petstore.model.AnimalType;
+import com.petstore.model.ItemCategory;
 import com.petstore.model.Status;
 import com.petstore.model.StoreItem;
 import com.petstore.service.AnimalService;
@@ -104,4 +106,11 @@ public class PetStoreController {
     public StoreItemDTO carryItem(@RequestBody StoreItem storeItem){
         return animalService.carryItem(storeItem);
     }
+
+    @PostMapping("/storeCatalog/add/{id}/{quantity}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public StoreItemDTO carryItem(@PathVariable long id , @PathVariable int quantity){
+        return animalService.addItemQuantity(id, quantity);
+    }
+
 }
