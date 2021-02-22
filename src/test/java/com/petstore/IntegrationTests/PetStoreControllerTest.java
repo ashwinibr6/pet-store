@@ -236,10 +236,24 @@ public class PetStoreControllerTest {
 
     }
 
+
     @Test
-    public void returnRequestedAnimalToShelter() throws Exception {
+  public void returnRequestedAnimalToShelter() throws Exception {
         animalRepository.saveAll(animalsEntities);
         List<AnimalReturnDto> expected = List.of(new AnimalReturnDto("1", "Bob is super friendly"), new AnimalReturnDto("2", "Seems to have fleas"));
+
+
+        MvcResult mvcResult = mockMvc.perform(delete("/animals/return-request")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(List.of(animalsEntities.get(0).getShelternateId(), animalsEntities.get(1).getShelternateId()))))
+                .andExpect(status().isOk())
+                .andReturn();
+        List<AnimalReturnDto> actualResponse = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<AnimalReturnDto>>() {});
+        assertEquals(expected, actualResponse);
+    }
+
+
+    @Test
     public void carryItemToStoreCatalog() throws Exception {
        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
        mockMvc.perform(post("/storeCatalog/carry").contentType(MediaType.APPLICATION_JSON)
@@ -259,13 +273,6 @@ public class PetStoreControllerTest {
     public void addItemToStoreCatalog() throws Exception {
         StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99, 10);
 
-        MvcResult mvcResult = mockMvc.perform(delete("/animals/return-request")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(List.of(animalsEntities.get(0).getShelternateId(), animalsEntities.get(1).getShelternateId()))))
-                .andExpect(status().isOk())
-                .andReturn();
-        List<AnimalReturnDto> actualResponse = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<AnimalReturnDto>>() {});
-        assertEquals(expected, actualResponse);
         storeItem = storeItemRepository.save(storeItem);
         int quantity = 5;
         mockMvc.perform(post("/storeCatalog/add/"+ storeItem.getId()+"/"+quantity))

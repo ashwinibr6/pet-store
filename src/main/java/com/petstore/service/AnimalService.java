@@ -134,12 +134,12 @@ public class AnimalService {
     }
 
     public void bondAnimals(List<String> bond) {
-        for (String id:bond){
-            Animal animal=animalRepository.findByShelternateId(id);
-            animal.setBond(bond.stream().filter(shelterId->!shelterId.equals(id)).collect(Collectors.toList()));
+        for (String id : bond) {
+            Animal animal = animalRepository.findByShelternateId(id);
+            animal.setBond(bond.stream().filter(shelterId -> !shelterId.equals(id)).collect(Collectors.toList()));
             animalRepository.save(animal);
         }
-
+    }
     public List<AnimalReturnDto> returnRequestedAnimalToShelter(List<String> shelterIds) {
         List<Animal> animals = shelterIds.stream().map(id -> animalRepository.findByShelternateId(id)).collect(Collectors.toList());
         shelterIds.stream().forEach(id -> animalRepository.deleteAnimalByShelternateId(id));
