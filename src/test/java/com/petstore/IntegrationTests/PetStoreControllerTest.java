@@ -1,6 +1,5 @@
 package com.petstore.IntegrationTests;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
@@ -11,8 +10,10 @@ import com.petstore.dto.AnimalReturnDto;
 import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
 import com.petstore.model.Status;
+import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
+import com.petstore.repository.StoreItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class PetStoreControllerTest {
     @Autowired
     AdoptionRequestRepository adoptionRequestRepository;
 
+    @Autowired
+    StoreItemRepository storeItemRepository;
+
     ObjectMapper mapper;
     List<AnimalDTO> animalsDTO;
     List<Animal> animalsEntities;
@@ -71,7 +75,6 @@ public class PetStoreControllerTest {
                 new Animal("4", "dog4", "DOG", LocalDate.of(2015, 03, 23), "MALE", "WHITE", new ArrayList<>(), ""),
                 new Animal("5", "bird", "BIRD", LocalDate.of(2015, 03, 23), "FEMALE", "GREEN", new ArrayList<>(), ""));
     }
-
 
     @Test
     public void homePage() throws Exception {
@@ -130,6 +133,7 @@ public class PetStoreControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(List.of(animalsEntities.get(0).getShelternateId(), animalsEntities.get(1).getShelternateId()))))
                 .andExpect(status().isOk());
+
     }
 
     @Test
@@ -156,6 +160,8 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("adoptionRequestDTO.status").value("APPROVED"))
                 .andExpect(jsonPath("adoptionRequestDTO.client").value("customer"))
                 .andExpect(jsonPath("shelterNetNotificationStatus").value("OK"));
+
+
     }
 
     @Test
@@ -179,6 +185,9 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("$.sex").value("FEMALE"))
                 .andExpect(jsonPath("$.color").value("BLACK"))
                 .andExpect(jsonPath("$.bond").value(expected));
+
+
+
     }
 
     @Test
@@ -197,7 +206,10 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("adoptionRequestDTO.status").value("DENIED"))
                 .andExpect(jsonPath("adoptionRequestDTO.client").value("customer"))
                 .andExpect(jsonPath("shelterNetNotificationStatus").doesNotExist());
+
+
     }
+
 
     @Test
     public void denyAdoptionRequestNonSeparable() throws Exception {
@@ -220,12 +232,32 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("adoptionRequestDTO.status").value("DENIED"))
                 .andExpect(jsonPath("adoptionRequestDTO.client").value("customer"))
                 .andExpect(jsonPath("shelterNetNotificationStatus").doesNotExist());
+
+
     }
 
     @Test
     public void returnRequestedAnimalToShelter() throws Exception {
         animalRepository.saveAll(animalsEntities);
         List<AnimalReturnDto> expected = List.of(new AnimalReturnDto("1", "Bob is super friendly"), new AnimalReturnDto("2", "Seems to have fleas"));
+    public void carryItemToStoreCatalog() throws Exception {
+       StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
+       mockMvc.perform(post("/storeCatalog/carry").contentType(MediaType.APPLICATION_JSON)
+       .content(mapper.writeValueAsString(storeItem)))
+               .andExpect(status().isAccepted())
+               .andExpect(jsonPath("sku").value(1))
+               .andExpect(jsonPath("itemCategory").value("FOOD"))
+               .andExpect(jsonPath("animalType").value("CAT"))
+               .andExpect(jsonPath("brand").value("Brand"))
+               .andExpect(jsonPath("name").value("SomeFood"))
+               .andExpect(jsonPath("description").value("Food for cats"))
+               .andExpect(jsonPath("price").value("9.99"));
+    }
+
+
+    @Test
+    public void addItemToStoreCatalog() throws Exception {
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99, 10);
 
         MvcResult mvcResult = mockMvc.perform(delete("/animals/return-request")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -234,5 +266,17 @@ public class PetStoreControllerTest {
                 .andReturn();
         List<AnimalReturnDto> actualResponse = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<AnimalReturnDto>>() {});
         assertEquals(expected, actualResponse);
+        storeItem = storeItemRepository.save(storeItem);
+        int quantity = 5;
+        mockMvc.perform(post("/storeCatalog/add/"+ storeItem.getId()+"/"+quantity))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("sku").value(1))
+                .andExpect(jsonPath("itemCategory").value("FOOD"))
+                .andExpect(jsonPath("animalType").value("CAT"))
+                .andExpect(jsonPath("brand").value("Brand"))
+                .andExpect(jsonPath("name").value("SomeFood"))
+                .andExpect(jsonPath("description").value("Food for cats"))
+                .andExpect(jsonPath("price").value("9.99"))
+                .andExpect(jsonPath("quantity").value(15));
     }
 }

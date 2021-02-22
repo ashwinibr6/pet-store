@@ -8,8 +8,11 @@ import com.petstore.dto.AnimalReturnDto;
 import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
 import com.petstore.model.Status;
+import com.petstore.dto.StoreItemDTO;
+import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
+import com.petstore.repository.StoreItemRepository;
 import com.petstore.service.AnimalService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +35,9 @@ public class AnimalServiceTest {
 
     @Mock
     AnimalRepository animalRepository;
+
+    @Mock
+    StoreItemRepository storeItemRepository;
 
     @Mock
     AdoptionRequestRepository adoptionRequestRepository;
@@ -123,11 +129,14 @@ public class AnimalServiceTest {
         when(adoptionRequestRepository.save(adoptionRequest)).thenReturn(adoptionRequest);
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "Approved, ready to be adopted");
 
+
         AdoptionRequestDTO actual = animalService.manageRequest(1l, processRequest);
         verify(animalRepository, times(2)).deleteAnimalByShelternateId(any());
 
         assertEquals(adoptionRequestDTO, actual);
+
     }
+
 
     @Test
     public void bondAnimal() {
@@ -147,10 +156,12 @@ public class AnimalServiceTest {
         when(adoptionRequestRepository.save(adoptionRequest)).thenReturn(adoptionRequest);
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
 
+
         AdoptionRequestDTO actual = animalService.manageRequest(1l, processRequest);
         verify(animalRepository, times(0)).deleteAnimalByShelternateId(any());
 
         assertEquals(adoptionRequestDTO, actual);
+
     }
 
     @Test
@@ -189,6 +200,33 @@ public class AnimalServiceTest {
 
         verify(animalRepository,times(2)).deleteAnimalByShelternateId(any());
         assertEquals(expected,actual);
+    }
+
+    @Test
+    public void carryStoreItem(){
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
+        StoreItemDTO storeItemDTO=new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
+        when(storeItemRepository.save(any())).thenReturn(storeItem);
+        StoreItemDTO actual=animalService.carryItem(storeItem);
+        assertEquals(storeItemDTO,actual);
+        verify(storeItemRepository).save(storeItem);
+    }
+
+    @Test
+    public void addItemQuantity(){
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
+                "Food for cats",9.99, 10);
+        StoreItemDTO storeItemDTO=new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
+                "Food for cats",9.99,15);
+        when(storeItemRepository.save(any())).thenReturn(storeItem);
+        when(storeItemRepository.getOne(any())).thenReturn(storeItem);
+
+        StoreItemDTO actual = animalService.addItemQuantity(1l, 5);
+
+        assertEquals(storeItemDTO, actual);
+        verify(storeItemRepository).save(storeItem);
+        verify(storeItemRepository).getOne(any());
+
     }
 }
 

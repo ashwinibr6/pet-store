@@ -8,8 +8,10 @@ import com.petstore.dto.AnimalReturnDto;
 import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
 import com.petstore.model.Status;
+import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
+import com.petstore.repository.StoreItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,6 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import javax.swing.text.Document;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -51,6 +52,9 @@ public class PetStoreRestDocs {
 
     @Autowired
     AnimalRepository animalRepository;
+
+    @Autowired
+    StoreItemRepository storeItemRepository;
 
     @Autowired
     AdoptionRequestRepository adoptionRequestRepository;
@@ -225,6 +229,8 @@ public class PetStoreRestDocs {
                 fieldWithPath("adoptionRequestDTO.animalDTOS.[0].bond").description("Bond of the animal"),
                 fieldWithPath("adoptionRequestDTO.animalDTOS.[0].note").description("Animal's note"),
                 fieldWithPath("shelterNetNotificationStatus").description("ShelterNet Notification Status"))));
+
+
     }
 
     @Test
@@ -310,4 +316,45 @@ public class PetStoreRestDocs {
                         fieldWithPath("[].note").description("Animal note"))));
 
     }
+    @Test
+    public void carryItemToStoreCatalog() throws Exception {
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
+        mockMvc.perform(post("/storeCatalog/carry").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(storeItem)))
+                .andExpect(status().isAccepted())
+                .andDo(document("carryItemToStoreCatalog",
+                        responseFields(
+                        fieldWithPath("sku").description("stocking unit -- ID"),
+                        fieldWithPath("itemCategory").description("Item category: FOOD,TOYS,HOMES,CARRIES"),
+                        fieldWithPath("animalType").description("Animal typ: CAT,DOG,BIRD"),
+                        fieldWithPath("brand").description("The item brand"),
+                        fieldWithPath("name").description("The item name"),
+                        fieldWithPath("description").description("The item description"),
+                        fieldWithPath("quantity").description("The item quantity to be added"),
+                        fieldWithPath("price").description("The item price"))));
+    }
+
+    @Test
+    public void addItemToStoreCatalog() throws Exception {
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99, 10);
+
+        storeItem = storeItemRepository.save(storeItem);
+        int quantity = 5;
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/storeCatalog/add/{id}/{quantity}",storeItem.getId(),quantity))
+                .andExpect(status().isAccepted())
+                .andDo(document("AddItemQuantityToStoreCatalog"
+                        ,pathParameters(
+                                parameterWithName("id").description("The store Item ID"),
+                                parameterWithName("quantity").description("The quantity of items to be added")),
+                        responseFields(
+                                fieldWithPath("sku").description("stocking unit -- ID"),
+                                fieldWithPath("itemCategory").description("Item category: FOOD,TOYS,HOMES,CARRIES"),
+                                fieldWithPath("animalType").description("Animal typ: CAT,DOG,BIRD"),
+                                fieldWithPath("brand").description("The item brand"),
+                                fieldWithPath("name").description("The item name"),
+                                fieldWithPath("description").description("The item description"),
+                                fieldWithPath("quantity").description("The item quantity to be added"),
+                                fieldWithPath("price").description("The item price"))));
+    }
+
 }
