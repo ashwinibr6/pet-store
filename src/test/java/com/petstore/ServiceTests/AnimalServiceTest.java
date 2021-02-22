@@ -1,6 +1,7 @@
 package com.petstore.ServiceTests;
 
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ItemPurchaseRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
@@ -47,6 +48,9 @@ public class AnimalServiceTest {
 
     List<AnimalDTO> animalsDTO;
     List<Animal> animals;
+    List<StoreItem> storeItems;
+    List<StoreItemDTO> storeItemDTOs;
+
 
     @BeforeEach
     void setUp() {
@@ -63,6 +67,15 @@ public class AnimalServiceTest {
                 new Animal("2", "cat3", "CAT", LocalDate.of(2015, 03, 23), "FEMALE", "BLACK",
                         List.of("1"), "Seems to have fleas")
         );
+
+        storeItems=List.of(new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
+                "Food for cats",9.99, 10),
+                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.DOG.name(),"Brand","Toy","Toy for dog",4.99, 15),
+                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.DOG.name(),"Brand","Home","Home for dog",20.99, 30));
+        storeItemDTOs=List.of(new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
+                        "Food for cats",9.99, 10),
+                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.DOG.name(),"Brand","Toy","Toy for dog",4.99, 15),
+                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.DOG.name(),"Brand","Home","Home for dog",20.99, 30));
     }
 
     @Test
@@ -214,19 +227,29 @@ public class AnimalServiceTest {
 
     @Test
     public void addItemQuantity(){
-        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
-                "Food for cats",9.99, 10);
-        StoreItemDTO storeItemDTO=new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
-                "Food for cats",9.99,15);
-        when(storeItemRepository.save(any())).thenReturn(storeItem);
-        when(storeItemRepository.getOne(any())).thenReturn(storeItem);
+        storeItemDTOs.get(0).setQuantity(15);
+        when(storeItemRepository.save(any())).thenReturn(storeItems.get(0));
+        when(storeItemRepository.getOne(any())).thenReturn(storeItems.get(0));
 
         StoreItemDTO actual = animalService.addItemQuantity(1l, 5);
 
-        assertEquals(storeItemDTO, actual);
-        verify(storeItemRepository).save(storeItem);
+        assertEquals(storeItemDTOs.get(0), actual);
+        verify(storeItemRepository).save(storeItems.get(0));
         verify(storeItemRepository).getOne(any());
 
     }
+
+    @Test
+    public void purchaseItemFromStoreWithCredit(){
+        List<ItemPurchaseRequest> itemPurchaseRequestList = List.of(new ItemPurchaseRequest(1l, 4), new ItemPurchaseRequest(2l, 10));
+        when(storeItemRepository.findBySku(1l)).thenReturn(storeItems.get(0));
+        when(storeItemRepository.findBySku(2l)).thenReturn(storeItems.get(1));
+
+        double actual = animalService.purchaseItemFromStoreWithCredit(itemPurchaseRequestList);
+        assertEquals(89.86, actual, 0.1);
+        verify(storeItemRepository, times(2)).save(any());
+    }
+
+
 }
 

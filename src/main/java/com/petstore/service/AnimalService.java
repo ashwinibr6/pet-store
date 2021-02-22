@@ -1,6 +1,7 @@
 package com.petstore.service;
 
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ItemPurchaseRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
@@ -16,6 +17,7 @@ import com.petstore.repository.StoreItemRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -157,5 +159,23 @@ public class AnimalService {
         storeItem.setQuantity(storeItem.getQuantity() + itemQuantity);
         return storeItemToDto( storeItemRepository.save(storeItem));
 
+    }
+
+    public double purchaseItemFromStoreWithCredit(List<ItemPurchaseRequest> itemPurchaseRequests) {
+
+        double finalPrice = itemPurchaseRequests.stream().map(storeItemRequest -> {
+            int quantity=storeItemRequest.getQuantity();
+            StoreItem storeItem=storeItemRepository.findBySku(storeItemRequest.getSku());
+            storeItem.setQuantity(storeItem.getQuantity()-quantity);
+            double prices= storeItem.getPrice()*quantity;
+
+            storeItemRepository.save(storeItem);
+
+            return prices;
+
+        } ).reduce(0.0, Double::sum);
+
+
+        return finalPrice;
     }
 }
