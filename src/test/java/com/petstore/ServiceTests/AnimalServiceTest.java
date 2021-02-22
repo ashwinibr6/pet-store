@@ -273,5 +273,51 @@ public class AnimalServiceTest {
         verify(storeItemRepository).getOne(any());
 
     }
+    @Test
+    public void searchAccessories(){
+        List<StoreItem> storeItems = List.of(
+                new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 15),
+                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 76),
+                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 34),
+                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 49)
+        );
+
+        when(storeItemRepository.findAll()).thenReturn(storeItems);
+
+
+        List<StoreItemDTO> actual = animalService.searchAccessories("sku", "1");
+
+        assertEquals(List.of(
+                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10)
+        ), actual);
+
+        actual = animalService.searchAccessories("category", "FOOD", "animal", "cat");
+
+        assertEquals(List.of(
+                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 76)
+
+        ), actual);
+
+        actual = animalService.searchAccessories("animal", "cat","category", "FOOD" );
+
+        assertEquals(List.of(
+                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 76)
+
+        ), actual);
+
+    }
 }
 

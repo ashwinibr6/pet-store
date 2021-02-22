@@ -5,4 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoreItemRepository extends JpaRepository<StoreItem,Long> {
 
+    StoreItem findBySku(long i);
+
+    StoreItem findByItemCategory(String itemCategory);
+
+    StoreItem findByAnimalType(String animalType);
 }

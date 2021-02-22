@@ -113,4 +113,20 @@ public class PetStoreController {
         return animalService.addItemQuantity(id, quantity);
     }
 
+
+    @GetMapping(value = {"/items/{searchType}/{searchValue}",
+            "/items/{searchType}/{searchValue}/{secondSearchType}/{secondSearchValue}"})
+    @ResponseStatus(HttpStatus.OK)
+    public List<StoreItemDTO> searchAccessories(@PathVariable String searchType ,
+                                             @PathVariable String searchValue,
+                                             @PathVariable String secondSearchType,
+                                             @PathVariable String secondSearchValue){
+
+        if(secondSearchType !=null && secondSearchValue !=null)
+            return animalService.searchAccessories(searchType,searchValue,
+                    secondSearchType,secondSearchValue);
+        else
+            return animalService.searchAccessories(searchType,searchValue);
+    }
+
 }

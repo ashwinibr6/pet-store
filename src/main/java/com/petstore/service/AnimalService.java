@@ -12,7 +12,9 @@ import com.petstore.repository.StoreItemRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -148,5 +150,33 @@ public class AnimalService {
         storeItem.setQuantity(storeItem.getQuantity() + itemQuantity);
         return storeItemToDto( storeItemRepository.save(storeItem));
 
+    }
+
+    public List<StoreItemDTO> searchAccessories(String ... args) {
+        List<StoreItem> items = storeItemRepository.findAll();
+        List<StoreItem> availableItems = new ArrayList<>();
+        if(args.length == 2 && (args[0].equals("sku")))
+            availableItems =items.stream().filter(item -> item.getSku().toString().equals(args[1]))
+                    .collect(Collectors.toList());
+
+        else if( args.length == 4)
+        {
+            if(args[0].equals("category") && args[2].equals("animal")){
+                availableItems =items.stream().filter(item -> item.getItemCategory().equals(args[1])
+                && item.getAnimalType().equals(args[3].toUpperCase()))
+                        .collect(Collectors.toList());
+
+        }
+            else  if(args[0].equals("animal") && args[2].equals("category")){
+                availableItems =items.stream().filter(item -> item.getItemCategory().equals(args[3])
+                        && item.getAnimalType().equals(args[1].toUpperCase()))
+                        .collect(Collectors.toList());
+        }
+     }
+
+        if(availableItems != null){
+            return availableItems.stream().map(item -> storeItemToDto(item)).collect(Collectors.toList());
+        }
+        return null;
     }
 }

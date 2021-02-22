@@ -7,6 +7,7 @@ import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.dto.StoreItemDTO;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
@@ -312,7 +313,8 @@ public class PetStoreControllerTest {
 
     @Test
     public void addItemToStoreCatalog() throws Exception {
-        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99, 10);
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                "Brand","SomeFood","Food for cats",9.99, 10);
 
         storeItem = storeItemRepository.save(storeItem);
         int quantity = 5;
@@ -326,5 +328,71 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("description").value("Food for cats"))
                 .andExpect(jsonPath("price").value("9.99"))
                 .andExpect(jsonPath("quantity").value(15));
+    }
+
+    @Test
+    public void searchAccessories() throws Exception {
+
+        List<StoreItem> items = List.of(
+                new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 15),
+                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 76),
+                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 34),
+                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 49)
+        );
+
+        List<StoreItemDTO> storeItems = List.of(
+                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 15),
+                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 76),
+                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 34),
+                new StoreItemDTO(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 49)
+        );
+        storeItemRepository.saveAll(items);
+        String searchType = "sku";
+        String searchvalue= "1";
+        mockMvc
+                .perform(get("/items/"+searchType+"/"+searchvalue))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].sku").value(1))
+                .andExpect(jsonPath("$.[0].itemCategory").value("FOOD"))
+                .andExpect(jsonPath("$.[0].animalType").value("CAT"))
+                .andExpect(jsonPath("$.[0].brand").value("Brand"))
+                .andExpect(jsonPath("$.[0].name").value("SomeFood"))
+                .andExpect(jsonPath("$.[0].description").value("Food for cats"))
+                .andExpect(jsonPath("$.[0].price").value("9.99"))
+                .andExpect(jsonPath("$.[0].quantity").value(10));
+
+         searchType = "animal";
+         searchvalue= "CAT";
+         String searchAnimalType = "category";
+         String searchAnimalValue = "TOYS";
+         mockMvc
+                .perform(get("/items/"+searchType+"/"+searchvalue
+                + "/" +searchAnimalType + "/" +searchAnimalValue))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].sku").value(2))
+                .andExpect(jsonPath("$.[0].itemCategory").value("TOYS"))
+                .andExpect(jsonPath("$.[0].animalType").value("CAT"))
+                .andExpect(jsonPath("$.[0].brand").value("Brand"))
+                .andExpect(jsonPath("$.[0].name").value("SomeFood"))
+                .andExpect(jsonPath("$.[0].description").value("Food for cats"))
+                .andExpect(jsonPath("$.[0].price").value("9.99"))
+                .andExpect(jsonPath("$.[0].quantity").value(15));
+         //items/animal/cat/category/food
+        ///items/category/food/animal/cat
+        //items/sku/23
+
+
     }
 }
