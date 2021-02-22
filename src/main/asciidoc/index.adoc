@@ -45,3 +45,46 @@ include::{snippets}/returnSickAnimalToShelter/http-request.adoc[]
 
 .response
 include::{snippets}/returnSickAnimalToShelter/http-response.adoc[]
+
+
+== Bond animals
+.request
+include::{snippets}/bondedanimal/http-request.adoc[]
+
+.response
+include::{snippets}/bondedanimal/http-response.adoc[]
+
+== Return animal By shelternateID
+.request
+include::{snippets}/getAnimal/http-request.adoc[]
+
+.response
+include::{snippets}/getAnimal/http-response.adoc[]
+
+== Approve animal adoption request
+.request
+include::{snippets}/ApproveAdoptionRequest/http-request.adoc[]
+
+.response
+include::{snippets}/ApproveAdoptionRequest/http-response.adoc[]
+
+== Deny animal adoption request for Inseparable animals
+.request
+include::{snippets}/DenyInSeparableAdoptionRequest/http-request.adoc[]
+
+.response
+include::{snippets}/DenyInSeparableAdoptionRequest/http-response.adoc[]
+
+== Deny animal adoption request for Non-separable animals
+.request
+include::{snippets}/DenyNonSeparableAdoptionRequest/http-request.adoc[]
+
+.response
+include::{snippets}/DenyNonSeparableAdoptionRequest/http-response.adoc[]
+
+== Carry item to the store catalog
+.request
+include::{snippets}/carryItemToStoreCatalog/http-request.adoc[]
+
+.response
+include::{snippets}/carryItemToStoreCatalog/http-response.adoc[]

@@ -2,7 +2,9 @@ package com.petstore.ServiceTests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.model.Status;
 import com.petstore.service.ShelterNetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,11 +41,11 @@ public class ShelterNetServiceTest {
     public void fetchAnimalsFromShelterNet() throws JsonProcessingException {
         List<Integer> animalsIds = List.of(1,2,3,4,5);
         List<AnimalDTO> animalsDto = List.of(
-                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK"),
-                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN"),
-                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW"),
-                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE"),
-                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN")
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",null),
+                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",null),
+                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",null),
+                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",null),
+                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",null)
         );
         /* To be uncommented once we get shelter end point*/
 //        Mockito
@@ -68,5 +71,28 @@ public class ShelterNetServiceTest {
 //        when(restTemplate.patchForObject("https://shelternet.herokuapp.com/?shelternateId=101","fever",HttpStatus.class)).thenReturn(HttpStatus.OK);
         HttpStatus actual=shelterNetService.returnSickAnimalToShelter("101","fever");
         assertEquals(HttpStatus.OK,actual);
+    }
+
+    @Test
+    public void notifyAnimalAdoption() throws JsonProcessingException {
+        List<AnimalDTO> animals = List.of(
+                new AnimalDTO("1","cat1","CAT",
+                        LocalDate.of(2015,03,23),"FEMALE","BLACK",new ArrayList<>()),
+                new AnimalDTO("2","cat2","CAT",
+                        LocalDate.of(2016,03,23),"MALE","BROWN",new ArrayList<>())
+        );
+        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals, Status.APPROVED.name()
+                , "Approved, ready to be adopted");
+
+
+        /* To be uncommented once we get shelter end point*/
+//        Mockito
+//                .when(restTemplate.postForObject("http://localhost/add-comment", adoptionRequestDTO, HttpStatus.class))
+//          .thenReturn(HttpStatus.OK);
+
+
+        HttpStatus actual = shelterNetService.notifyAnimalAdoption(adoptionRequestDTO);
+        assertEquals(HttpStatus.OK,actual);
+
     }
 }
