@@ -10,6 +10,7 @@ import com.petstore.dto.AnimalDTO;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
+import com.petstore.repository.StoreItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ public class PetStoreControllerTest {
 
     @Autowired
     AdoptionRequestRepository adoptionRequestRepository;
+
+    @Autowired
+    StoreItemRepository storeItemRepository;
 
     ObjectMapper mapper;
 
@@ -303,11 +307,24 @@ public class PetStoreControllerTest {
                .andExpect(jsonPath("name").value("SomeFood"))
                .andExpect(jsonPath("description").value("Food for cats"))
                .andExpect(jsonPath("price").value("9.99"));
+    }
 
 
+    @Test
+    public void addItemToStoreCatalog() throws Exception {
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99, 10);
 
-
-
-
+        storeItem = storeItemRepository.save(storeItem);
+        int quantity = 5;
+        mockMvc.perform(post("/storeCatalog/add/"+ storeItem.getId()+"/"+quantity))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("sku").value(1))
+                .andExpect(jsonPath("itemCategory").value("FOOD"))
+                .andExpect(jsonPath("animalType").value("CAT"))
+                .andExpect(jsonPath("brand").value("Brand"))
+                .andExpect(jsonPath("name").value("SomeFood"))
+                .andExpect(jsonPath("description").value("Food for cats"))
+                .andExpect(jsonPath("price").value("9.99"))
+                .andExpect(jsonPath("quantity").value(15));
     }
 }

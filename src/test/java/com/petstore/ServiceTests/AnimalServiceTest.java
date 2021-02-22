@@ -256,5 +256,22 @@ public class AnimalServiceTest {
         assertEquals(storeItemDTO,actual);
         verify(storeItemRepository).save(storeItem);
     }
+
+    @Test
+    public void addItemQuantity(){
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
+                "Food for cats",9.99, 10);
+        StoreItemDTO storeItemDTO=new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
+                "Food for cats",9.99,15);
+        when(storeItemRepository.save(any())).thenReturn(storeItem);
+        when(storeItemRepository.getOne(any())).thenReturn(storeItem);
+
+        StoreItemDTO actual = animalService.addItemQuantity(1l, 5);
+
+        assertEquals(storeItemDTO, actual);
+        verify(storeItemRepository).save(storeItem);
+        verify(storeItemRepository).getOne(any());
+
+    }
 }
 

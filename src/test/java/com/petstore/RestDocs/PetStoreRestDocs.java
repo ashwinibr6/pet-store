@@ -7,6 +7,7 @@ import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
+import com.petstore.repository.StoreItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class PetStoreRestDocs {
 
     @Autowired
     AnimalRepository animalRepository;
+
+    @Autowired
+    StoreItemRepository storeItemRepository;
 
     @Autowired
     AdoptionRequestRepository adoptionRequestRepository;
@@ -331,6 +335,31 @@ public class PetStoreRestDocs {
                         fieldWithPath("brand").description("The item brand"),
                         fieldWithPath("name").description("The item name"),
                         fieldWithPath("description").description("The item description"),
+                        fieldWithPath("quantity").description("The item quantity to be added"),
                         fieldWithPath("price").description("The item price"))));
     }
+
+    @Test
+    public void addItemToStoreCatalog() throws Exception {
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99, 10);
+
+        storeItem = storeItemRepository.save(storeItem);
+        int quantity = 5;
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/storeCatalog/add/{id}/{quantity}",storeItem.getId(),quantity))
+                .andExpect(status().isAccepted())
+                .andDo(document("AddItemQuantityToStoreCatalog"
+                        ,pathParameters(
+                                parameterWithName("id").description("The store Item ID"),
+                                parameterWithName("quantity").description("The quantity of items to be added")),
+                        responseFields(
+                                fieldWithPath("sku").description("stocking unit -- ID"),
+                                fieldWithPath("itemCategory").description("Item category: FOOD,TOYS,HOMES,CARRIES"),
+                                fieldWithPath("animalType").description("Animal typ: CAT,DOG,BIRD"),
+                                fieldWithPath("brand").description("The item brand"),
+                                fieldWithPath("name").description("The item name"),
+                                fieldWithPath("description").description("The item description"),
+                                fieldWithPath("quantity").description("The item quantity to be added"),
+                                fieldWithPath("price").description("The item price"))));
+    }
+
 }
