@@ -82,6 +82,13 @@ include::{snippets}/DenyNonSeparableAdoptionRequest/http-request.adoc[]
 .response
 include::{snippets}/DenyNonSeparableAdoptionRequest/http-response.adoc[]
 
+== Return Requested animal to ShelterNet
+.request
+include::{snippets}/returnRequestedAnimalToShelter/http-request.adoc[]
+
+.response
+include::{snippets}/returnRequestedAnimalToShelter/http-response.adoc[]
+
 == Carry item to the store catalog
 .request
 include::{snippets}/carryItemToStoreCatalog/http-request.adoc[]
