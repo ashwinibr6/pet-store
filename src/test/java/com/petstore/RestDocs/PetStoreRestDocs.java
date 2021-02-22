@@ -298,9 +298,8 @@ public class PetStoreRestDocs {
     }
 
     @Test
-    public void returnRequestedAnimalToShelter(){
+    public void returnRequestedAnimalToShelter() throws Exception{
         animalRepository.saveAll(animalsEntities);
-        List<AnimalReturnDto> expected = List.of(new AnimalReturnDto("1", "Bob is super friendly"), new AnimalReturnDto("2", "Seems to have fleas"));
 
         mockMvc.perform(delete("/animals/return-request")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -308,7 +307,7 @@ public class PetStoreRestDocs {
                 .andExpect(status().isOk())
                 .andDo(document("returnRequestedAnimalToShelter",responseFields(
                         fieldWithPath("[].id").description("ShelterNetId of Animal"),
-                        fieldWithPath("[].note]").description("Animal note"))));
+                        fieldWithPath("[].note").description("Animal note"))));
 
     }
 }
