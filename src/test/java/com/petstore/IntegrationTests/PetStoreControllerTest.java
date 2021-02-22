@@ -1,12 +1,15 @@
 package com.petstore.IntegrationTests;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.dto.AnimalReturnDto;
+import com.petstore.model.AdoptionRequest;
+import com.petstore.model.Animal;
+import com.petstore.model.Status;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
@@ -50,10 +53,27 @@ public class PetStoreControllerTest {
     StoreItemRepository storeItemRepository;
 
     ObjectMapper mapper;
+    List<AnimalDTO> animalsDTO;
+    List<Animal> animalsEntities;
 
     @BeforeEach
     void setUp() {
-        mapper =  new ObjectMapper();
+        mapper = new ObjectMapper();
+
+        animalsDTO = List.of(
+                new AnimalDTO("1", "cat1", "CAT", LocalDate.of(2015, 03, 23), "FEMALE", "BLACK", List.of("2", "3"), "Bob is super friendly"),
+                new AnimalDTO("2", "cat2", "CAT", LocalDate.of(2016, 03, 23), "MALE", "BROWN", List.of("1", "3"), "Seems to have fleas"),
+                new AnimalDTO("3", "dog1", "DOG", LocalDate.of(2017, 03, 23), "FEMALE", "YELLOW", List.of("1", "2"), ""),
+                new AnimalDTO("4", "dog4", "DOG", LocalDate.of(2015, 03, 23), "MALE", "WHITE", new ArrayList<>(), ""),
+                new AnimalDTO("5", "bird", "BIRD", LocalDate.of(2015, 03, 23), "FEMALE", "GREEN", new ArrayList<>(), "")
+        );
+
+        animalsEntities = List.of(
+                new Animal("1", "cat1", "CAT", LocalDate.of(2015, 03, 23), "FEMALE", "BLACK", List.of("2", "3"), "Bob is super friendly"),
+                new Animal("2", "cat2", "CAT", LocalDate.of(2016, 03, 23), "MALE", "BROWN", List.of("1", "3"), "Seems to have fleas"),
+                new Animal("3", "dog1", "DOG", LocalDate.of(2017, 03, 23), "FEMALE", "YELLOW", List.of("1", "2"), ""),
+                new Animal("4", "dog4", "DOG", LocalDate.of(2015, 03, 23), "MALE", "WHITE", new ArrayList<>(), ""),
+                new Animal("5", "bird", "BIRD", LocalDate.of(2015, 03, 23), "FEMALE", "GREEN", new ArrayList<>(), ""));
     }
 
     @Test
@@ -67,11 +87,7 @@ public class PetStoreControllerTest {
 
     @Test
     public void getAllAnimals() throws Exception {
-        animalRepository.saveAll(List.of(
-                new Animal("101","Lion1","species",LocalDate.of(2015,12,27)
-                , "Male","Gold", new ArrayList<>()),
-                new Animal("101","Lion2","species",LocalDate.of(2017,3,12)
-                        , "Female","Gold", new ArrayList<>())));
+        animalRepository.saveAll(animalsEntities);
 
         mockMvc.perform(get("/animals"))
                 .andExpect(status().isOk());
@@ -79,42 +95,24 @@ public class PetStoreControllerTest {
 
     @Test
     public void retrieveListAnimalsFromShelterAndStore() throws Exception {
-        List<AnimalDTO> animals = List.of(
-                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",new ArrayList<>()),
-                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",new ArrayList<>()),
-                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",new ArrayList<>()),
-                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",new ArrayList<>()),
-                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",new ArrayList<>())
-        );
-
-        List<Integer> animalsIds = List.of(1,2,3,4,5);
+        List<Integer> animalsIds = List.of(1, 2, 3, 4, 5);
         MvcResult result = mockMvc
                 .perform(post("/animals").contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(animalsIds)))
+                        .content(mapper.writeValueAsString(animalsIds)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
         List<AnimalDTO> actual = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<AnimalDTO>>() {
         });
 
-        assertEquals(animals, actual);
+        assertEquals(animalsDTO, actual);
     }
 
     @Test
     public void createAdoptAnimalRequest() throws Exception {
-
-        List<AnimalDTO> animals = List.of(
-                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",new ArrayList<>()),
-                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",new ArrayList<>())
-       );
-        AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer",animals, Status.PENDING.toString(),"");
-
-        List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK", new ArrayList<>()),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
-       );
+        AdoptionRequestDTO adoptionRequest = new AdoptionRequestDTO("customer", List.of(animalsDTO.get(0), animalsDTO.get(1)), Status.PENDING.toString(), "");
         animalsEntities = animalRepository.saveAll(animalsEntities);
-        List<String> shelterNetIds = List.of(animalsEntities.get(0).getShelternateId(),animalsEntities.get(1).getShelternateId());
+        List<String> shelterNetIds = List.of(animalsEntities.get(0).getShelternateId(), animalsEntities.get(1).getShelternateId());
 
         CustomerRequest customerRequest = new CustomerRequest("customer", shelterNetIds);
         MvcResult result = mockMvc
@@ -129,66 +127,33 @@ public class PetStoreControllerTest {
 
     @Test
     public void returnAnimalToShelter() throws Exception {
-
-        Animal animal1= new Animal("101","Lion1","species",LocalDate.of(2015,12,27)
-                        , "Male","Gold", new ArrayList<>());
-        Animal animal2=  new Animal("102","Monkey","species",LocalDate.of(2017,3,12)
-                        , "Female","Gold", new ArrayList<>());
-        Animal animal3=     new Animal("103","Cat","species",LocalDate.of(2018,2,7)
-                        , "Male","Gold", new ArrayList<>());
-        Animal animal4=    new Animal("104","Zebra","species",LocalDate.of(2020,1,1)
-                        , "Female","Gold", new ArrayList<>());
-
-        Animal animal5=new Animal("101","Lion1","species",LocalDate.of(2015,10,27)
-                , "Male","Gold", new ArrayList<>());
-
-        animalRepository.saveAll(List.of(animal1,animal2,animal3,animal4,animal5));
+        animalRepository.saveAll(animalsEntities);
 
         mockMvc.perform(delete("/animalreturns")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(mapper.writeValueAsString(List.of(animal1.getShelternateId(),animal2.getShelternateId()))))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(List.of(animalsEntities.get(0).getShelternateId(), animalsEntities.get(1).getShelternateId()))))
                 .andExpect(status().isOk());
 
     }
 
     @Test
     public void returnSickAnimalToShelter() throws Exception {
-        Animal animal1 = new Animal("101", "Lion1", "species", LocalDate.of(2015, 12, 27)
-                , "Male", "Gold", new ArrayList<>());
-        Animal animal2 = new Animal("102", "Monkey", "species", LocalDate.of(2017, 3, 12)
-                , "Female", "Gold", new ArrayList<>());
-        Animal animal3 = new Animal("103", "Cat", "species", LocalDate.of(2018, 2, 7)
-                , "Male", "Gold", new ArrayList<>());
-        Animal animal4 = new Animal("104", "Zebra", "species", LocalDate.of(2020, 1, 1)
-                , "Female", "Gold", new ArrayList<>());
+        animalRepository.saveAll(animalsEntities);
 
-        Animal animal5 = new Animal("105", "Lion1", "species", LocalDate.of(2015, 10, 27)
-                , "Male", "Gold", new ArrayList<>());
-
-        animalRepository.saveAll(List.of(animal1, animal2, animal3, animal4, animal5));
-
-        mockMvc.perform(delete("/sickanimal/?shelternateId=101&diagnosis=fever"))
+        mockMvc.perform(delete("/sickanimal/?shelternateId=1&diagnosis=fever"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void approveAdoptionRequest() throws Exception {
-
-        List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
-                        List.of("2")),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",
-                        List.of("1")),
-                new Animal("3","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
-        );
         animalsEntities = animalRepository.saveAll(animalsEntities);
-        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.toString());
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer", animalsEntities, Status.PENDING.toString());
         adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
 
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "Approved, ready to be adopted");
 
         mockMvc
-                .perform(put("/adopt/request/"+adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                .perform(put("/adopt/request/" + adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("adoptionRequestDTO.comment").value("Approved, ready to be adopted"))
@@ -201,38 +166,24 @@ public class PetStoreControllerTest {
 
     @Test
     public void bondAnimal() throws Exception {
-
-        Animal animal1 = new Animal("1", "Lion1", "species", LocalDate.of(2015, 12, 27)
-                , "Male", "Gold", new ArrayList<>());
-        Animal animal2 = new Animal("2", "Monkey", "species", LocalDate.of(2017, 3, 12)
-                , "Female", "Gold", new ArrayList<>());
-        Animal animal3 = new Animal("3", "Cat", "species", LocalDate.of(2018, 2, 7)
-                , "Male", "Gold", new ArrayList<>());
-        Animal animal4 = new Animal("4", "Zebra", "species", LocalDate.of(2020, 1, 1)
-                , "Female", "Gold", new ArrayList<>());
-
-        Animal animal5 = new Animal("5", "Lion1", "species", LocalDate.of(2015, 10, 27)
-                , "Male", "Gold", new ArrayList<>());
-
-        animalRepository.saveAll(List.of(animal1, animal2, animal3, animal4, animal5));
+        animalRepository.saveAll(animalsEntities);
 
         mockMvc.perform(patch("/bondedanimal")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(List.of(1,2,3))))
+                .content(mapper.writeValueAsString(List.of(1, 2, 3))))
                 .andExpect(status().isOk());
 
-        List<String> expected=new ArrayList<>();
+        List<String> expected = new ArrayList<>();
         expected.add("2");
         expected.add("3");
-
         mockMvc.perform(get("/animal/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.shelternateId").value("1"))
-                .andExpect(jsonPath("$.animalName").value("Lion1"))
-                .andExpect(jsonPath("$.species").value("species"))
-                .andExpect(jsonPath("$.birthDate").value("2015-12-27"))
-                .andExpect(jsonPath("$.sex").value("Male"))
-                .andExpect(jsonPath("$.color").value("Gold"))
+                .andExpect(jsonPath("$.animalName").value("cat1"))
+                .andExpect(jsonPath("$.species").value("CAT"))
+                .andExpect(jsonPath("$.birthDate").value("2015-03-23"))
+                .andExpect(jsonPath("$.sex").value("FEMALE"))
+                .andExpect(jsonPath("$.color").value("BLACK"))
                 .andExpect(jsonPath("$.bond").value(expected));
 
 
@@ -241,22 +192,14 @@ public class PetStoreControllerTest {
 
     @Test
     public void denyAdoptionRequestInSeparable() throws Exception {
-
-        List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
-                        List.of("2")),
-                new Animal("2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",
-                        List.of("1")),
-                new Animal("3","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
-        );
         animalsEntities = animalRepository.saveAll(animalsEntities);
-        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.toString());
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer", animalsEntities, Status.PENDING.toString());
         adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
 
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
 
         mockMvc
-                .perform(put("/adopt/request/"+adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                .perform(put("/adopt/request/" + adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("adoptionRequestDTO.comment").value("Denied, Can't be adopted"))
@@ -270,20 +213,19 @@ public class PetStoreControllerTest {
 
     @Test
     public void denyAdoptionRequestNonSeparable() throws Exception {
-
         List<Animal> animalsEntities = List.of(
-                new Animal("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",
-                        List.of("2")),
-                new Animal("3","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN", new ArrayList<>())
+                new Animal("1", "cat1", "CAT", LocalDate.of(2015, 03, 23), "FEMALE", "BLACK",
+                        List.of("2"), ""),
+                new Animal("3", "cat2", "CAT", LocalDate.of(2016, 03, 23), "MALE", "BROWN", new ArrayList<>(), "")
         );
         animalsEntities = animalRepository.saveAll(animalsEntities);
-        AdoptionRequest adoptionRequest = new AdoptionRequest("customer",animalsEntities, Status.PENDING.toString());
+        AdoptionRequest adoptionRequest = new AdoptionRequest("customer", animalsEntities, Status.PENDING.toString());
         adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
 
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
 
         mockMvc
-                .perform(put("/adopt/request/"+adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                .perform(put("/adopt/request/" + adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("adoptionRequestDTO.comment").value("Denied, Can't be adopted"))
@@ -293,6 +235,23 @@ public class PetStoreControllerTest {
 
 
     }
+
+
+    @Test
+  public void returnRequestedAnimalToShelter() throws Exception {
+        animalRepository.saveAll(animalsEntities);
+        List<AnimalReturnDto> expected = List.of(new AnimalReturnDto("1", "Bob is super friendly"), new AnimalReturnDto("2", "Seems to have fleas"));
+
+
+        MvcResult mvcResult = mockMvc.perform(delete("/animals/return-request")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(List.of(animalsEntities.get(0).getShelternateId(), animalsEntities.get(1).getShelternateId()))))
+                .andExpect(status().isOk())
+                .andReturn();
+        List<AnimalReturnDto> actualResponse = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<AnimalReturnDto>>() {});
+        assertEquals(expected, actualResponse);
+    }
+
 
     @Test
     public void carryItemToStoreCatalog() throws Exception {
