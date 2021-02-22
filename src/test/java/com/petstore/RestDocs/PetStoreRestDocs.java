@@ -4,9 +4,7 @@ package com.petstore.RestDocs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
-import com.petstore.model.AdoptionRequest;
-import com.petstore.model.Animal;
-import com.petstore.model.Status;
+import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -318,5 +316,21 @@ public class PetStoreRestDocs {
                         fieldWithPath("shelterNetNotificationStatus").description("ShelterNet Notification Status"))));
 
 
+    }
+    @Test
+    public void carryItemToStoreCatalog() throws Exception {
+        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
+        mockMvc.perform(post("/storeCatalog/carry").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(storeItem)))
+                .andExpect(status().isAccepted())
+                .andDo(document("carryItemToStoreCatalog",
+                        responseFields(
+                        fieldWithPath("sku").description("stocking unit -- ID"),
+                        fieldWithPath("itemCategory").description("Item category: FOOD,TOYS,HOMES,CARRIES"),
+                        fieldWithPath("animalType").description("Animal typ: CAT,DOG,BIRD"),
+                        fieldWithPath("brand").description("The item brand"),
+                        fieldWithPath("name").description("The item name"),
+                        fieldWithPath("description").description("The item description"),
+                        fieldWithPath("price").description("The item price"))));
     }
 }

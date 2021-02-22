@@ -4,11 +4,11 @@ import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
-import com.petstore.model.AdoptionRequest;
-import com.petstore.model.Animal;
-import com.petstore.model.Status;
+import com.petstore.dto.StoreItemDTO;
+import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
+import com.petstore.repository.StoreItemRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -21,16 +21,27 @@ public class AnimalService {
 
     private AnimalRepository animalRepository;
     private AdoptionRequestRepository adoptionRequestRepository;
+    private StoreItemRepository storeItemRepository;
+
 
     public AnimalService(AnimalRepository animalRepository,
-                         AdoptionRequestRepository adoptionRequestRepository) {
+                         AdoptionRequestRepository adoptionRequestRepository,
+                                StoreItemRepository storeItemRepository) {
+
         this.animalRepository = animalRepository;
         this.adoptionRequestRepository = adoptionRequestRepository;
+        this.storeItemRepository=storeItemRepository;
+
     }
 
     private Animal mapTo(AnimalDTO animalDTO) {
         return new Animal(animalDTO.getShelternateId(), animalDTO.getAnimalName(), animalDTO.getSpecies(),
                 animalDTO.getBirthDate(), animalDTO.getSex(), animalDTO.getColor(), animalDTO.getBond());
+    }
+    private StoreItemDTO storeItemToDto(StoreItem storeItem) {
+        return new StoreItemDTO(storeItem.getSku(),storeItem.getItemCategory(),storeItem.getAnimalType(),storeItem.getBrand(),storeItem.getName(),storeItem.getDescription(),
+                storeItem.getPrice()
+          );
     }
 
     private AnimalDTO mapToDto(Animal animal) {
@@ -123,6 +134,11 @@ public class AnimalService {
             animal.setBond(bond.stream().filter(shelterId->!shelterId.equals(id)).collect(Collectors.toList()));
             animalRepository.save(animal);
         }
+
+    }
+
+    public StoreItemDTO carryItem(StoreItem storeItem) {
+        return storeItemToDto( storeItemRepository.save(storeItem));
 
     }
 }
