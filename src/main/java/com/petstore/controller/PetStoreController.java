@@ -2,6 +2,7 @@ package com.petstore.controller;
 
 import com.petstore.POJO.AdoptionResponse;
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ItemPurchaseRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
@@ -118,6 +119,11 @@ public class PetStoreController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public StoreItemDTO carryItem(@PathVariable long id , @PathVariable int quantity){
         return animalService.addItemQuantity(id, quantity);
+    }
+
+    @PatchMapping("/storeCatalog/purchaseItem/credit/")
+    public double purchaseItemFromStoreWithCredit(@RequestBody List<ItemPurchaseRequest> itemPurchaseRequests){
+        return animalService.purchaseItemFromStoreWithCredit(itemPurchaseRequests);
     }
 
 }
