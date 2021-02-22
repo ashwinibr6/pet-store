@@ -2,9 +2,11 @@ package com.petstore.controller;
 
 import com.petstore.POJO.AdoptionResponse;
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ItemPurchaseRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.dto.AnimalReturnDto;
 import com.petstore.dto.StoreItemDTO;
 import com.petstore.model.AnimalType;
 import com.petstore.model.ItemCategory;
@@ -63,6 +65,12 @@ public class PetStoreController {
         }
     }
 
+    @DeleteMapping("/animals/return-request")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AnimalReturnDto> retunRequestedAnimalToShelter(@RequestBody List<String> shelterIds) {
+        return animalService.returnRequestedAnimalToShelter(shelterIds);
+    }
+
     @DeleteMapping("/sickanimal")
     @ResponseStatus(HttpStatus.OK)
     public void returnSickAnimalToShelter(@RequestParam String shelternateId, @RequestParam String diagnosis) {
@@ -111,6 +119,11 @@ public class PetStoreController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public StoreItemDTO carryItem(@PathVariable long id , @PathVariable int quantity){
         return animalService.addItemQuantity(id, quantity);
+    }
+
+    @PatchMapping("/storeCatalog/purchaseItem/credit/")
+    public double purchaseItemFromStoreWithCredit(@RequestBody List<ItemPurchaseRequest> itemPurchaseRequests){
+        return animalService.purchaseItemFromStoreWithCredit(itemPurchaseRequests);
     }
 
 }

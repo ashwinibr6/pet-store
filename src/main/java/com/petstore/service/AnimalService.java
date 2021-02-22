@@ -1,9 +1,14 @@
 package com.petstore.service;
 
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ItemPurchaseRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.dto.AnimalReturnDto;
+import com.petstore.model.AdoptionRequest;
+import com.petstore.model.Animal;
+import com.petstore.model.Status;
 import com.petstore.dto.StoreItemDTO;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
@@ -12,6 +17,7 @@ import com.petstore.repository.StoreItemRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +42,7 @@ public class AnimalService {
 
     private Animal mapTo(AnimalDTO animalDTO) {
         return new Animal(animalDTO.getShelternateId(), animalDTO.getAnimalName(), animalDTO.getSpecies(),
-                animalDTO.getBirthDate(), animalDTO.getSex(), animalDTO.getColor(), animalDTO.getBond());
+                animalDTO.getBirthDate(), animalDTO.getSex(), animalDTO.getColor(), animalDTO.getBond(), animalDTO.getNote());
     }
     private StoreItemDTO storeItemToDto(StoreItem storeItem) {
         return new StoreItemDTO(storeItem.getSku(),storeItem.getItemCategory(),storeItem.getAnimalType(),
@@ -47,7 +53,7 @@ public class AnimalService {
 
     private AnimalDTO mapToDto(Animal animal) {
         return new AnimalDTO(animal.getShelternateId(), animal.getAnimalName(), animal.getSpecies(),
-                animal.getBirthDate(), animal.getSex(), animal.getColor(),animal.getBond());
+                animal.getBirthDate(), animal.getSex(), animal.getColor(), animal.getBond(), animal.getNote());
     }
 
     private AdoptionRequestDTO mapToAdoptionRequestDto(AdoptionRequest adoptionRequest) {
@@ -130,12 +136,17 @@ public class AnimalService {
     }
 
     public void bondAnimals(List<String> bond) {
-        for (String id:bond){
-            Animal animal=animalRepository.findByShelternateId(id);
-            animal.setBond(bond.stream().filter(shelterId->!shelterId.equals(id)).collect(Collectors.toList()));
+        for (String id : bond) {
+            Animal animal = animalRepository.findByShelternateId(id);
+            animal.setBond(bond.stream().filter(shelterId -> !shelterId.equals(id)).collect(Collectors.toList()));
             animalRepository.save(animal);
         }
+    }
+    public List<AnimalReturnDto> returnRequestedAnimalToShelter(List<String> shelterIds) {
+        List<Animal> animals = shelterIds.stream().map(id -> animalRepository.findByShelternateId(id)).collect(Collectors.toList());
+        shelterIds.stream().forEach(id -> animalRepository.deleteAnimalByShelternateId(id));
 
+        return animals.stream().map(animal -> new AnimalReturnDto(animal.getShelternateId(), animal.getNote())).collect(Collectors.toList());
     }
 
     public StoreItemDTO carryItem(StoreItem storeItem) {
@@ -148,5 +159,23 @@ public class AnimalService {
         storeItem.setQuantity(storeItem.getQuantity() + itemQuantity);
         return storeItemToDto( storeItemRepository.save(storeItem));
 
+    }
+
+    public double purchaseItemFromStoreWithCredit(List<ItemPurchaseRequest> itemPurchaseRequests) {
+
+        double finalPrice = itemPurchaseRequests.stream().map(storeItemRequest -> {
+            int quantity=storeItemRequest.getQuantity();
+            StoreItem storeItem=storeItemRepository.findBySku(storeItemRequest.getSku());
+            storeItem.setQuantity(storeItem.getQuantity()-quantity);
+            double prices= storeItem.getPrice()*quantity;
+
+            storeItemRepository.save(storeItem);
+
+            return prices;
+
+        } ).reduce(0.0, Double::sum);
+
+
+        return finalPrice;
     }
 }

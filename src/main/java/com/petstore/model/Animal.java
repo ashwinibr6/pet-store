@@ -29,8 +29,9 @@ public class Animal {
     private String color;
     @ElementCollection
     private List<String> bond;
+    private String note;
 
-    public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color,List<String> bond) {
+    public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color,List<String> bond,String note) {
         this.shelternateId = shelternateId;
         this.animalName = animalName;
         this.species = species;
@@ -39,24 +40,27 @@ public class Animal {
         this.color = color;
         if(bond==null) bond=new ArrayList<>();
         this.bond= new ArrayList<>(bond);
+        this.note = note;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Animal)) return false;
         Animal animal = (Animal) o;
-        return Objects.equals(id, animal.id) &&
-                Objects.equals(shelternateId, animal.shelternateId) &&
-                Objects.equals(animalName, animal.animalName) &&
-                Objects.equals(species, animal.species) &&
-                Objects.equals(birthDate, animal.birthDate) &&
-                Objects.equals(sex, animal.sex) &&
-                Objects.equals(color, animal.color);
+        return Objects.equals(getId(), animal.getId()) &&
+                Objects.equals(getShelternateId(), animal.getShelternateId()) &&
+                Objects.equals(getAnimalName(), animal.getAnimalName()) &&
+                Objects.equals(getSpecies(), animal.getSpecies()) &&
+                Objects.equals(getBirthDate(), animal.getBirthDate()) &&
+                Objects.equals(getSex(), animal.getSex()) &&
+                Objects.equals(getColor(), animal.getColor()) &&
+                Objects.equals(getBond(), animal.getBond()) &&
+                Objects.equals(getNote(), animal.getNote());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, shelternateId, animalName, species, birthDate, sex, color);
+        return Objects.hash(getId(), getShelternateId(), getAnimalName(), getSpecies(), getBirthDate(), getSex(), getColor(), getBond(), getNote());
     }
 }

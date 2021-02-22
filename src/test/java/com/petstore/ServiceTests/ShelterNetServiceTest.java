@@ -31,29 +31,31 @@ public class ShelterNetServiceTest {
     private ShelterNetService shelterNetService;
 
     ObjectMapper objectMapper;
+    List<AnimalDTO> animalsDTO;
 
     @BeforeEach
     public void setUp(){
         objectMapper = new ObjectMapper();
+        animalsDTO =  List.of(
+                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",List.of("2","3"),"Bob is super friendly"),
+                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",List.of("1","3"),"Seems to have fleas"),
+                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",List.of("1","2"),""),
+                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",new ArrayList<>(),""),
+                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",new ArrayList<>(),"")
+        );
     }
 
     @Test
     public void fetchAnimalsFromShelterNet() throws JsonProcessingException {
         List<Integer> animalsIds = List.of(1,2,3,4,5);
-        List<AnimalDTO> animalsDto = List.of(
-                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",null),
-                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",null),
-                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",null),
-                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",null),
-                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",null)
-        );
+
         /* To be uncommented once we get shelter end point*/
 //        Mockito
 //                .when(restTemplate.postForObject("http://localhost/add-comment", animalsIds, String.class))
 //          .thenReturn(objectMapper.writeValueAsString(animalsDto));
 
         List<AnimalDTO> actual = shelterNetService.fetchAnimals(animalsIds);
-        assertEquals(animalsDto, actual);
+        assertEquals(animalsDTO, actual);
     }
 
     @Test
@@ -75,13 +77,7 @@ public class ShelterNetServiceTest {
 
     @Test
     public void notifyAnimalAdoption() throws JsonProcessingException {
-        List<AnimalDTO> animals = List.of(
-                new AnimalDTO("1","cat1","CAT",
-                        LocalDate.of(2015,03,23),"FEMALE","BLACK",new ArrayList<>()),
-                new AnimalDTO("2","cat2","CAT",
-                        LocalDate.of(2016,03,23),"MALE","BROWN",new ArrayList<>())
-        );
-        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animals, Status.APPROVED.name()
+        AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animalsDTO, Status.APPROVED.name()
                 , "Approved, ready to be adopted");
 
 
