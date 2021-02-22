@@ -290,4 +290,10 @@ public class PetStoreControllerTest {
 
 
     }
+
+    @Test
+    public void carryItemToStoreCatalog(){
+      //  StoreItem storeItem=new StoreItem()
+
+    }
 }
