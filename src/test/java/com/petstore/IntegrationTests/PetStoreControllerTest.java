@@ -1,14 +1,13 @@
 package com.petstore.IntegrationTests;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
-import com.petstore.model.AdoptionRequest;
-import com.petstore.model.Animal;
-import com.petstore.model.Status;
+import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -292,8 +291,23 @@ public class PetStoreControllerTest {
     }
 
     @Test
-    public void carryItemToStoreCatalog(){
-      //  StoreItem storeItem=new StoreItem()
+    public void carryItemToStoreCatalog() throws Exception {
+       StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
+       mockMvc.perform(post("/storeCatalog/carry").contentType(MediaType.APPLICATION_JSON)
+       .content(mapper.writeValueAsString(storeItem)))
+               .andExpect(status().isAccepted())
+               .andExpect(jsonPath("sku").value(1))
+               .andExpect(jsonPath("itemCategory").value("FOOD"))
+               .andExpect(jsonPath("animalType").value("CAT"))
+               .andExpect(jsonPath("brand").value("Brand"))
+               .andExpect(jsonPath("name").value("SomeFood"))
+               .andExpect(jsonPath("description").value("Food for cats"))
+               .andExpect(jsonPath("price").value("9.99"));
+
+
+
+
+
 
     }
 }
