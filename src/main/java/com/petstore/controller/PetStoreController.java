@@ -5,6 +5,7 @@ import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.dto.AnimalReturnDto;
 import com.petstore.model.Status;
 import com.petstore.service.AnimalService;
 import com.petstore.service.ShelterNetService;
@@ -59,6 +60,12 @@ public class PetStoreController {
         }
     }
 
+    @DeleteMapping("/animals/return-request")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AnimalReturnDto> retunRequestedAnimalToShelter(@RequestBody List<String> shelterIds) {
+        return animalService.returnRequestedAnimalToShelter(shelterIds);
+    }
+
     @DeleteMapping("/sickanimal")
     @ResponseStatus(HttpStatus.OK)
     public void returnSickAnimalToShelter(@RequestParam String shelternateId, @RequestParam String diagnosis) {
@@ -76,24 +83,22 @@ public class PetStoreController {
         HttpStatus shelterNetNotificationStatus = null;
         AdoptionRequestDTO adoptionRequestDTO = animalService.manageRequest(id, processAdoptionRequest);
 
-        if(adoptionRequestDTO != null
+        if (adoptionRequestDTO != null
                 && adoptionRequestDTO.getStatus().equals(Status.APPROVED.name()))
             shelterNetNotificationStatus = shelterNetService.notifyAnimalAdoption(adoptionRequestDTO);
-
         AdoptionResponse adoptionResponse = new AdoptionResponse(shelterNetNotificationStatus, adoptionRequestDTO);
-
         return adoptionResponse;
     }
 
     @PatchMapping("/bondedanimal")
     @ResponseStatus(HttpStatus.OK)
-    public void bondAnimal(@RequestBody List<String> shelternateID){
+    public void bondAnimal(@RequestBody List<String> shelternateID) {
         animalService.bondAnimals(shelternateID);
     }
 
     @GetMapping("/animal/{shelternateID}")
     @ResponseStatus(HttpStatus.OK)
-    public AnimalDTO getAnimal(@PathVariable String shelternateID){
+    public AnimalDTO getAnimal(@PathVariable String shelternateID) {
         return animalService.getAnimal(shelternateID);
     }
 }
