@@ -66,14 +66,28 @@ public class AnimalServiceTest {
                         List.of("1"), "Seems to have fleas")
         );
 
-        storeItems=List.of(new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
-                "Food for cats",9.99, 10),
-                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.DOG.name(),"Brand","Toy","Toy for dog",4.99, 15),
-                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.DOG.name(),"Brand","Home","Home for dog",20.99, 30));
-        storeItemDTOs=List.of(new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
-                        "Food for cats",9.99, 10),
-                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.DOG.name(),"Brand","Toy","Toy for dog",4.99, 15),
-                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.DOG.name(),"Brand","Home","Home for dog",20.99, 30));
+        storeItems=List.of(new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",4.99, 15),
+                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",20.99, 76),
+                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",6.59, 34),
+                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",2.49, 49));
+
+
+        storeItemDTOs=List.of(new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",4.99, 15),
+                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",20.99, 76),
+                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",6.59, 34),
+                new StoreItemDTO(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",2.49, 49));
     }
 
     @Test
@@ -238,24 +252,8 @@ public class AnimalServiceTest {
     }
     @Test
     public void searchAccessories(){
-        List<StoreItem> storeItems = List.of(
-                new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 10),
-                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 15),
-                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76),
-                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 34),
-                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 49)
-        );
-
         when(storeItemRepository.findAll()).thenReturn(storeItems);
-
-
         List<StoreItemDTO> actual = animalService.searchAccessories("sku", "1");
-
         assertEquals(List.of(
                 new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
                         "Brand","SomeFood","Food for cats",9.99, 10)
@@ -267,8 +265,7 @@ public class AnimalServiceTest {
                 new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
                         "Brand","SomeFood","Food for cats",9.99, 10),
                 new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76)
-
+                        "Brand","SomeFood","Food for cats",20.99, 76)
         ), actual);
 
         actual = animalService.searchAccessories("animal", "cat","category", "FOOD" );
@@ -277,26 +274,13 @@ public class AnimalServiceTest {
                 new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
                         "Brand","SomeFood","Food for cats",9.99, 10),
                 new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76)
+                        "Brand","SomeFood","Food for cats",20.99, 76)
 
         ), actual);
 
     }
     @Test
     public void searchItemNotExist_BadURL(){
-        List<StoreItem> storeItems = List.of(
-                new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 10),
-                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 15),
-                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76),
-                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 34),
-                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 49)
-        );
-
         when(storeItemRepository.findAll()).thenReturn(storeItems);
         ItemNotFoundException exception = assertThrows(ItemNotFoundException.class,
                 ()->animalService.searchAccessories("skuu","1"));

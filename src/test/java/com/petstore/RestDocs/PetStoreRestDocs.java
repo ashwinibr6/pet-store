@@ -88,9 +88,16 @@ public class PetStoreRestDocs {
 
         animalReturnDtos =  List.of(new AnimalReturnDto("1", "Bob is super friendly"), new AnimalReturnDto("2", "Seems to have fleas"));
 
-        storeItemDTOS = List.of(new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99, 10),
-                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.DOG.name(),"Brand","Toy","Toy for dog",4.99, 15),
-                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.DOG.name(),"Brand","Home","Home for dog",20.99, 30));
+        storeItemDTOS = List.of(new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",4.99, 15),
+                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",20.99, 76),
+                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",6.59, 34),
+                new StoreItemDTO(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",2.49, 49));
     }
 
     @Test
@@ -354,33 +361,7 @@ public class PetStoreRestDocs {
     @Test
     public void searchAccessories() throws Exception {
 
-        List<StoreItem> items = List.of(
-                new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 10),
-                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 15),
-                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76),
-                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 34),
-                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 49)
-        );
-
-        List<StoreItemDTO> storeItems = List.of(
-                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 10),
-                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 15),
-                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76),
-                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 34),
-                new StoreItemDTO(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 49)
-        );
-
-        storeItemRepository.saveAll(items);
+        when(animalService.searchAccessories("sku","1")).thenReturn(List.of(storeItemDTOS.get(0)));
         String searchType = "sku";
         String searchvalue= "1";
         mockMvc
@@ -404,6 +385,8 @@ public class PetStoreRestDocs {
         searchvalue= "CAT";
         String searchAnimalType = "category";
         String searchAnimalValue = "TOYS";
+        when(animalService.searchAccessories("animal","CAT","category","TOYS"))
+                .thenReturn(List.of(storeItemDTOS.get(1)));
         mockMvc
                 .perform(RestDocumentationRequestBuilders.get("/items/{searchType}/{searchValue}/{searchAnimalType}/{searchAnimalValue}",
                         searchType,searchvalue,searchAnimalType,searchAnimalValue))
