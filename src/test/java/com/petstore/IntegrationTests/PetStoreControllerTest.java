@@ -1,6 +1,5 @@
 package com.petstore.IntegrationTests;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
@@ -8,12 +7,8 @@ import com.petstore.POJO.ItemPurchaseRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
-import com.petstore.dto.StoreItemDTO;
-import com.petstore.exception.ItemNotFoundException;
 import com.petstore.dto.AnimalReturnDto;
-import com.petstore.model.AdoptionRequest;
-import com.petstore.model.Animal;
-import com.petstore.model.Status;
+import com.petstore.exception.ItemNotFoundException;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
@@ -32,7 +27,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -80,9 +76,16 @@ public class PetStoreControllerTest {
                 new Animal("4", "dog4", "DOG", LocalDate.of(2015, 03, 23), "MALE", "WHITE", new ArrayList<>(), ""),
                 new Animal("5", "bird", "BIRD", LocalDate.of(2015, 03, 23), "FEMALE", "GREEN", new ArrayList<>(), ""));
 
-         storeItems = List.of(new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99, 10),
-                 new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.DOG.name(),"Brand","Toy","Toy for dog",4.99, 15),
-                 new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.DOG.name(),"Brand","Home","Home for dog",20.99, 30));
+         storeItems = List.of(new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                         "Brand","SomeFood","Food for cats",9.99, 10),
+                 new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                         "Brand","SomeFood","Food for cats",4.99, 15),
+                 new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                         "Brand","SomeFood","Food for cats",20.99, 76),
+                 new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                         "Brand","SomeFood","Food for cats",6.59, 34),
+                 new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                         "Brand","SomeFood","Food for cats",2.49, 49));
 
     }
 
@@ -281,9 +284,9 @@ public class PetStoreControllerTest {
 
     @Test
     public void addItemToStoreCatalog() throws Exception {
-        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                "Brand","SomeFood","Food for cats",9.99, 10);
-
+//        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+//                "Brand","SomeFood","Food for cats",9.99, 10);
+//
 
         StoreItem storeItem = storeItemRepository.save(storeItems.get(0));
         int quantity = 5;
@@ -302,32 +305,7 @@ public class PetStoreControllerTest {
     @Test
     public void searchAccessories() throws Exception {
 
-        List<StoreItem> items = List.of(
-                new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 10),
-                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 15),
-                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76),
-                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 34),
-                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 49)
-        );
-
-        List<StoreItemDTO> storeItems = List.of(
-                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 10),
-                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 15),
-                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76),
-                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 34),
-                new StoreItemDTO(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 49)
-        );
-        storeItemRepository.saveAll(items);
+        List<StoreItem> items = storeItemRepository.saveAll(storeItems);
         String searchType = "sku";
         String searchvalue= "1";
         mockMvc
@@ -356,7 +334,7 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("$.[0].brand").value("Brand"))
                 .andExpect(jsonPath("$.[0].name").value("SomeFood"))
                 .andExpect(jsonPath("$.[0].description").value("Food for cats"))
-                .andExpect(jsonPath("$.[0].price").value("9.99"))
+                .andExpect(jsonPath("$.[0].price").value("4.99"))
                 .andExpect(jsonPath("$.[0].quantity").value(15));
 
     }
@@ -364,32 +342,7 @@ public class PetStoreControllerTest {
     @Test
     public void searchAccessories_BadRequest() throws Exception {
 
-        List<StoreItem> items = List.of(
-                new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 10),
-                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 15),
-                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76),
-                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 34),
-                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 49)
-        );
-
-        List<StoreItemDTO> storeItems = List.of(
-                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 10),
-                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 15),
-                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 76),
-                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 34),
-                new StoreItemDTO(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
-                        "Brand","SomeFood","Food for cats",9.99, 49)
-        );
-        storeItemRepository.saveAll(items);
+        List<StoreItem> items = storeItemRepository.saveAll(storeItems);
         String searchType = "skuu";
         String searchvalue= "1";
         mockMvc
