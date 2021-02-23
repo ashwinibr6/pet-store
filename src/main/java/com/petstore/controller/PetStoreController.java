@@ -8,10 +8,7 @@ import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.AnimalReturnDto;
 import com.petstore.dto.StoreItemDTO;
-import com.petstore.model.AnimalType;
-import com.petstore.model.ItemCategory;
 import com.petstore.model.Status;
-import com.petstore.model.StoreItem;
 import com.petstore.service.AnimalService;
 import com.petstore.service.ShelterNetService;
 import org.springframework.http.HttpStatus;
@@ -111,8 +108,8 @@ public class PetStoreController {
 
     @PostMapping("/storeCatalog/carry")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public StoreItemDTO carryItem(@RequestBody StoreItem storeItem){
-        return animalService.carryItem(storeItem);
+    public StoreItemDTO carryItem(@RequestBody StoreItemDTO storeItemDTO){
+        return animalService.carryItem(storeItemDTO);
     }
 
     @PostMapping("/storeCatalog/add/{id}/{quantity}")
