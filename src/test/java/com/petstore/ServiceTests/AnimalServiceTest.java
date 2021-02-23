@@ -6,16 +6,12 @@ import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.AnimalReturnDto;
-import com.petstore.model.AdoptionRequest;
-import com.petstore.model.Animal;
-import com.petstore.model.Status;
 import com.petstore.dto.StoreItemDTO;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import com.petstore.repository.StoreItemRepository;
 import com.petstore.service.AnimalService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -219,8 +215,8 @@ public class AnimalServiceTest {
     public void carryStoreItem(){
         StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
         StoreItemDTO storeItemDTO=new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
-        when(storeItemRepository.save(any())).thenReturn(storeItem);
-        StoreItemDTO actual=animalService.carryItem(storeItem);
+        when(storeItemRepository.save(storeItem)).thenReturn(storeItem);
+        StoreItemDTO actual=animalService.carryItem(storeItemDTO);
         assertEquals(storeItemDTO,actual);
         verify(storeItemRepository).save(storeItem);
     }

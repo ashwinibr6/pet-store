@@ -1,6 +1,5 @@
 package com.petstore.IntegrationTests;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
@@ -9,9 +8,6 @@ import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.AnimalReturnDto;
-import com.petstore.model.AdoptionRequest;
-import com.petstore.model.Animal;
-import com.petstore.model.Status;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
@@ -193,9 +189,6 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("$.sex").value("FEMALE"))
                 .andExpect(jsonPath("$.color").value("BLACK"))
                 .andExpect(jsonPath("$.bond").value(expected));
-
-
-
     }
 
     @Test
