@@ -139,6 +139,21 @@ public class PetStoreControllerTest {
     }
 
     @Test
+    public void addDuplicateAnimals() throws Exception {
+        List<Integer> animalsIds = List.of(1, 2, 3, 4, 5);
+        MvcResult result = mockMvc
+                .perform(post("/animals").contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(animalsIds)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        MvcResult badRequest = mockMvc
+                .perform(post("/animals").contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(animalsIds)))
+                .andReturn();
+    }
+
+    @Test
     public void returnAnimalToShelter() throws Exception {
         animalRepository.saveAll(animalsEntities);
 
