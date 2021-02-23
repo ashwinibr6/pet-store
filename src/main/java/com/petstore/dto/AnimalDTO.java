@@ -28,5 +28,6 @@ public class AnimalDTO {
     private String sex;
     private String color;
     private List<String> bond=new ArrayList<>();
+    private String note;
 
 }

@@ -2,9 +2,11 @@ package com.petstore.controller;
 
 import com.petstore.POJO.AdoptionResponse;
 import com.petstore.POJO.CustomerRequest;
+import com.petstore.POJO.ItemPurchaseRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.dto.AnimalReturnDto;
 import com.petstore.dto.StoreItemDTO;
 import com.petstore.model.AnimalType;
 import com.petstore.model.ItemCategory;
@@ -61,6 +63,12 @@ public class PetStoreController {
         if (status.is2xxSuccessful()) {
             animalService.removeAnimals(shelterIds);
         }
+    }
+
+    @DeleteMapping("/animals/return-request")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AnimalReturnDto> retunRequestedAnimalToShelter(@RequestBody List<String> shelterIds) {
+        return animalService.returnRequestedAnimalToShelter(shelterIds);
     }
 
     @DeleteMapping("/sickanimal")
@@ -133,5 +141,10 @@ public class PetStoreController {
                     secondSearchType,secondSearchValue);
     }
 
+
+    @PatchMapping("/storeCatalog/purchaseItem/credit/")
+    public double purchaseItemFromStoreWithCredit(@RequestBody List<ItemPurchaseRequest> itemPurchaseRequests){
+        return animalService.purchaseItemFromStoreWithCredit(itemPurchaseRequests);
+    }
 
 }
