@@ -6,12 +6,14 @@ import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.AnimalReturnDto;
+import com.petstore.dto.StoreItemDTO;
 import com.petstore.model.AdoptionRequest;
 import com.petstore.model.Animal;
 import com.petstore.model.Status;
 import com.petstore.dto.StoreItemDTO;
 import com.petstore.exception.ItemNotFoundException;
 import com.petstore.model.*;
+import com.petstore.model.StoreItem;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import com.petstore.repository.StoreItemRepository;
@@ -152,9 +154,13 @@ public class AnimalService {
         return animals.stream().map(animal -> new AnimalReturnDto(animal.getShelternateId(), animal.getNote())).collect(Collectors.toList());
     }
 
-    public StoreItemDTO carryItem(StoreItem storeItem) {
-        return storeItemToDto( storeItemRepository.save(storeItem));
+    public StoreItemDTO carryItem(StoreItemDTO storeItemDTO) {
+        return storeItemToDto(storeItemRepository.save(mapDTOtoStoreItem(storeItemDTO)));
+    }
 
+    private StoreItem mapDTOtoStoreItem(StoreItemDTO storeItemDTO) {
+        return new StoreItem(storeItemDTO.getSku(), storeItemDTO.getItemCategory(), storeItemDTO.getAnimalType(), storeItemDTO.getBrand(),
+                            storeItemDTO.getName(), storeItemDTO.getDescription(), storeItemDTO.getPrice(),storeItemDTO.getQuantity());
     }
 
     public StoreItemDTO addItemQuantity(long itemId, int itemQuantity) {

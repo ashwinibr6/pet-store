@@ -1,6 +1,6 @@
 package com.petstore.model;
 
-import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +12,7 @@ import javax.persistence.Id;
 @Getter
 @Entity
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 public class StoreItem {
     @Id

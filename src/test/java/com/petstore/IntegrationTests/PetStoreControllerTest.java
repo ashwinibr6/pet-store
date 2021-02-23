@@ -198,9 +198,6 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("$.sex").value("FEMALE"))
                 .andExpect(jsonPath("$.color").value("BLACK"))
                 .andExpect(jsonPath("$.bond").value(expected));
-
-
-
     }
 
     @Test
@@ -284,9 +281,7 @@ public class PetStoreControllerTest {
 
     @Test
     public void addItemToStoreCatalog() throws Exception {
-//        StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
-//                "Brand","SomeFood","Food for cats",9.99, 10);
-//
+
 
         StoreItem storeItem = storeItemRepository.save(storeItems.get(0));
         int quantity = 5;

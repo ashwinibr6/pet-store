@@ -116,3 +116,11 @@ include::{snippets}/searchByCategoryAndAnimalType/http-request.adoc[]
 
 .response
 include::{snippets}/searchByCategoryAndAnimalType/http-response.adoc[]
+
+
+== Purchase item from store with credit
+.request
+include::{snippets}/PurchaseItemFromStoreWithCredit/http-request.adoc[]
+
+.response
+include::{snippets}/PurchaseItemFromStoreWithCredit/http-response.adoc[]
