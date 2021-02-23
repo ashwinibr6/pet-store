@@ -5,6 +5,7 @@ import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.StoreItemDTO;
+import com.petstore.exception.ItemNotFoundException;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
@@ -174,9 +175,11 @@ public class AnimalService {
         }
      }
 
-        if(availableItems != null){
+        if(availableItems.size() > 0){
             return availableItems.stream().map(item -> storeItemToDto(item)).collect(Collectors.toList());
         }
-        return null;
+        else throw new ItemNotFoundException("Item not found or bad URL");
+
+      //  return null;
     }
 }

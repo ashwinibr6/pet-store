@@ -5,6 +5,7 @@ import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.StoreItemDTO;
+import com.petstore.exception.ItemNotFoundException;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -319,5 +321,29 @@ public class AnimalServiceTest {
         ), actual);
 
     }
+    @Test
+    public void searchItemNotExist_BadURL(){
+        List<StoreItem> storeItems = List.of(
+                new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 15),
+                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 76),
+                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 34),
+                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 49)
+        );
+
+        when(storeItemRepository.findAll()).thenReturn(storeItems);
+        ItemNotFoundException exception = assertThrows(ItemNotFoundException.class,
+                ()->animalService.searchAccessories("skuu","1"));
+        assertEquals("Item not found or bad URL",exception.getMessage());
+        exception=assertThrows(ItemNotFoundException.class,
+                ()->animalService.searchAccessories("categories", "FOOD", "animal", "cat"));
+        assertEquals("Item not found or bad URL",exception.getMessage());
+    }
+
 }
 

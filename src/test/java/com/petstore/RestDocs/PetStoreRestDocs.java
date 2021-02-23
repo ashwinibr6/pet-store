@@ -4,6 +4,7 @@ package com.petstore.RestDocs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
+import com.petstore.dto.StoreItemDTO;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
@@ -360,6 +361,82 @@ public class PetStoreRestDocs {
                                 fieldWithPath("description").description("The item description"),
                                 fieldWithPath("quantity").description("The item quantity to be added"),
                                 fieldWithPath("price").description("The item price"))));
+    }
+
+    @Test
+    public void searchAccessories() throws Exception {
+
+        List<StoreItem> items = List.of(
+                new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 15),
+                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 76),
+                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 34),
+                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 49)
+        );
+
+        List<StoreItemDTO> storeItems = List.of(
+                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 15),
+                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 76),
+                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 34),
+                new StoreItemDTO(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 49)
+        );
+
+        storeItemRepository.saveAll(items);
+        String searchType = "sku";
+        String searchvalue= "1";
+        mockMvc
+                .perform(RestDocumentationRequestBuilders.get("/items/{searchType}/{searchValue}",searchType,searchvalue))
+                .andExpect(status().isOk())
+                .andDo(document("searchBySku"
+                ,pathParameters(
+                        parameterWithName("searchType").description("sku search type"),
+                        parameterWithName("searchValue").description("sku ID")),
+                responseFields(
+                        fieldWithPath("[0].sku").description("stocking unit -- ID"),
+                        fieldWithPath("[0].itemCategory").description("Item category: FOOD,TOYS,HOMES,CARRIES"),
+                        fieldWithPath("[0].animalType").description("Animal typ: CAT,DOG,BIRD"),
+                        fieldWithPath("[0].brand").description("The item brand"),
+                        fieldWithPath("[0].name").description("The item name"),
+                        fieldWithPath("[0].description").description("The item description"),
+                        fieldWithPath("[0].price").description("The item quantity to be added"),
+                        fieldWithPath("[0].quantity").description("The item price"))));
+
+        searchType = "animal";
+        searchvalue= "CAT";
+        String searchAnimalType = "category";
+        String searchAnimalValue = "TOYS";
+        mockMvc
+                .perform(RestDocumentationRequestBuilders.get("/items/{searchType}/{searchValue}/{searchAnimalType}/{searchAnimalValue}",
+                        searchType,searchvalue,searchAnimalType,searchAnimalValue))
+                .andExpect(status().isOk())
+                .andDo(document("searchByCategoryAndAnimalType"
+                        ,pathParameters(
+                                parameterWithName("searchType").description("category or animal type search"),
+                                parameterWithName("searchValue").description("category or animal type search keyword"),
+                               parameterWithName("searchAnimalType").description("category or animal type search"),
+                               parameterWithName("searchAnimalValue").description("category or animal type search keyword")),
+
+                        responseFields(
+                                fieldWithPath("[0].sku").description("stocking unit -- ID"),
+                                fieldWithPath("[0].itemCategory").description("Item category: FOOD,TOYS,HOMES,CARRIES"),
+                                fieldWithPath("[0].animalType").description("Animal typ: CAT,DOG,BIRD"),
+                                fieldWithPath("[0].brand").description("The item brand"),
+                                fieldWithPath("[0].name").description("The item name"),
+                                fieldWithPath("[0].description").description("The item description"),
+                                fieldWithPath("[0].price").description("The item quantity to be added"),
+                                fieldWithPath("[0].quantity").description("The item price"))));
+
     }
 
 }

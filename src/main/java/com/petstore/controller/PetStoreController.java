@@ -114,19 +114,24 @@ public class PetStoreController {
     }
 
 
-    @GetMapping(value = {"/items/{searchType}/{searchValue}",
-            "/items/{searchType}/{searchValue}/{secondSearchType}/{secondSearchValue}"})
+    @GetMapping("/items/{searchType}/{searchValue}")
     @ResponseStatus(HttpStatus.OK)
-    public List<StoreItemDTO> searchAccessories(@PathVariable String searchType ,
-                                             @PathVariable String searchValue,
-                                             @PathVariable String secondSearchType,
-                                             @PathVariable String secondSearchValue){
+    public List<StoreItemDTO> searchAccessoriesSku(@PathVariable String searchType ,
+                                             @PathVariable String searchValue){
 
-        if(secondSearchType !=null && secondSearchValue !=null)
-            return animalService.searchAccessories(searchType,searchValue,
-                    secondSearchType,secondSearchValue);
-        else
             return animalService.searchAccessories(searchType,searchValue);
     }
+
+    @GetMapping("/items/{searchType}/{searchValue}/{secondSearchType}/{secondSearchValue}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<StoreItemDTO> searchAccessories(@PathVariable String searchType ,
+                                                @PathVariable String searchValue,
+                                                @PathVariable String secondSearchType,
+                                                @PathVariable String secondSearchValue){
+
+            return animalService.searchAccessories(searchType,searchValue,
+                    secondSearchType,secondSearchValue);
+    }
+
 
 }

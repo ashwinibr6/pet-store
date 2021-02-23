@@ -88,3 +88,24 @@ include::{snippets}/carryItemToStoreCatalog/http-request.adoc[]
 
 .response
 include::{snippets}/carryItemToStoreCatalog/http-response.adoc[]
+
+== Adding item quantity to the catalog
+.request
+include::{snippets}/AddItemQuantityToStoreCatalog/http-request.adoc[]
+
+.response
+include::{snippets}/AddItemQuantityToStoreCatalog/http-response.adoc[]
+
+== Search by SKU
+.request
+include::{snippets}/searchBySku/http-request.adoc[]
+
+.response
+include::{snippets}/searchBySku/http-response.adoc[]
+
+== Search by category and animal type
+.request
+include::{snippets}/searchByCategoryAndAnimalType/http-request.adoc[]
+
+.response
+include::{snippets}/searchByCategoryAndAnimalType/http-response.adoc[]
