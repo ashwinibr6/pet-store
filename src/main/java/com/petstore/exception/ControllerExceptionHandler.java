@@ -12,4 +12,9 @@ public class ControllerExceptionHandler {
     public ResponseEntity<String> handleAddAnimalException(AddAnimalException exception) {
         return new ResponseEntity<String>(exception.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ItemNotFoundException.class)
+    public ResponseEntity<String> handleItemNotFoundException(ItemNotFoundException exception) {
+        return new ResponseEntity<String>(exception.getLocalizedMessage(), HttpStatus.NOT_FOUND);
+    }
 }
