@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 
 @Configuration
 @Profile("heroku")
-public class Config {
+public class DatabaseConfiguration {
         @Bean
         public DataSource dataSource() throws URISyntaxException {
             URI dbUri = new URI(System.getenv("DATABASE_URL"));

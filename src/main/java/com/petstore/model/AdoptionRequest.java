@@ -1,13 +1,14 @@
 package com.petstore.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Getter
-
+@Setter
 public class AdoptionRequest {
 
     @Id
@@ -19,9 +20,14 @@ public class AdoptionRequest {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Animal> animals ;
 
-    public AdoptionRequest(String client, List<Animal> animals) {
+    private String status;
+    private String comment;
+
+    public AdoptionRequest(String client, List<Animal> animals, String status) {
         this.client = client;
         this.animals = animals;
+        this.status = status;
+        this.comment = "";
     }
 
     @Override
@@ -31,14 +37,18 @@ public class AdoptionRequest {
 
         AdoptionRequest that = (AdoptionRequest) o;
 
-        if (client != null ? !client.equals(that.client) : that.client != null) return false;
-        return animals != null ? animals.equals(that.animals) : that.animals == null;
+        if (!client.equals(that.client)) return false;
+        if (!animals.equals(that.animals)) return false;
+        if (!status.equals(that.status)) return false;
+        return comment != null ? comment.equals(that.comment) : that.comment == null;
     }
 
     @Override
     public int hashCode() {
-        int result = client != null ? client.hashCode() : 0;
-        result = 31 * result + (animals != null ? animals.hashCode() : 0);
+        int result = client.hashCode();
+        result = 31 * result + animals.hashCode();
+        result = 31 * result + status.hashCode();
+        result = 31 * result + (comment != null ? comment.hashCode() : 0);
         return result;
     }
 }

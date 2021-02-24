@@ -15,5 +15,9 @@ public class AdoptionRequestDTO {
 
     private List<AnimalDTO> animalDTOS;
 
+    private String status;
+
+    private String comment;
+
 
 }

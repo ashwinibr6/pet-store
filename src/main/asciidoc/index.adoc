@@ -60,3 +60,67 @@ include::{snippets}/getAnimal/http-request.adoc[]
 
 .response
 include::{snippets}/getAnimal/http-response.adoc[]
+
+== Approve animal adoption request
+.request
+include::{snippets}/ApproveAdoptionRequest/http-request.adoc[]
+
+.response
+include::{snippets}/ApproveAdoptionRequest/http-response.adoc[]
+
+== Deny animal adoption request for Inseparable animals
+.request
+include::{snippets}/DenyInSeparableAdoptionRequest/http-request.adoc[]
+
+.response
+include::{snippets}/DenyInSeparableAdoptionRequest/http-response.adoc[]
+
+== Deny animal adoption request for Non-separable animals
+.request
+include::{snippets}/DenyNonSeparableAdoptionRequest/http-request.adoc[]
+
+.response
+include::{snippets}/DenyNonSeparableAdoptionRequest/http-response.adoc[]
+
+== Return Requested animal to ShelterNet
+.request
+include::{snippets}/returnRequestedAnimalToShelter/http-request.adoc[]
+
+.response
+include::{snippets}/returnRequestedAnimalToShelter/http-response.adoc[]
+
+== Carry item to the store catalog
+.request
+include::{snippets}/carryItemToStoreCatalog/http-request.adoc[]
+
+.response
+include::{snippets}/carryItemToStoreCatalog/http-response.adoc[]
+
+== Adding item quantity to the catalog
+.request
+include::{snippets}/AddItemQuantityToStoreCatalog/http-request.adoc[]
+
+.response
+include::{snippets}/AddItemQuantityToStoreCatalog/http-response.adoc[]
+
+== Search by SKU
+.request
+include::{snippets}/searchBySku/http-request.adoc[]
+
+.response
+include::{snippets}/searchBySku/http-response.adoc[]
+
+== Search by category and animal type
+.request
+include::{snippets}/searchByCategoryAndAnimalType/http-request.adoc[]
+
+.response
+include::{snippets}/searchByCategoryAndAnimalType/http-response.adoc[]
+
+
+== Purchase item from store with credit
+.request
+include::{snippets}/PurchaseItemFromStoreWithCredit/http-request.adoc[]
+
+.response
+include::{snippets}/PurchaseItemFromStoreWithCredit/http-response.adoc[]
