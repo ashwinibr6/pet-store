@@ -6,16 +6,13 @@ import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.AnimalReturnDto;
-import com.petstore.model.AdoptionRequest;
-import com.petstore.model.Animal;
-import com.petstore.model.Status;
 import com.petstore.dto.StoreItemDTO;
+import com.petstore.exception.ItemNotFoundException;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import com.petstore.repository.StoreItemRepository;
 import com.petstore.service.AnimalService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,14 +66,28 @@ public class AnimalServiceTest {
                         List.of("1"), "Seems to have fleas")
         );
 
-        storeItems=List.of(new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
-                "Food for cats",9.99, 10),
-                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.DOG.name(),"Brand","Toy","Toy for dog",4.99, 15),
-                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.DOG.name(),"Brand","Home","Home for dog",20.99, 30));
-        storeItemDTOs=List.of(new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood",
-                        "Food for cats",9.99, 10),
-                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.DOG.name(),"Brand","Toy","Toy for dog",4.99, 15),
-                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.DOG.name(),"Brand","Home","Home for dog",20.99, 30));
+        storeItems=List.of(new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",4.99, 15),
+                new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",20.99, 76),
+                new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",6.59, 34),
+                new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",2.49, 49));
+
+
+        storeItemDTOs=List.of(new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItemDTO(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",4.99, 15),
+                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",20.99, 76),
+                new StoreItemDTO(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",6.59, 34),
+                new StoreItemDTO(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                        "Brand","SomeFood","Food for cats",2.49, 49));
     }
 
     @Test
@@ -219,8 +231,8 @@ public class AnimalServiceTest {
     public void carryStoreItem(){
         StoreItem storeItem=new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
         StoreItemDTO storeItemDTO=new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99);
-        when(storeItemRepository.save(any())).thenReturn(storeItem);
-        StoreItemDTO actual=animalService.carryItem(storeItem);
+        when(storeItemRepository.save(storeItem)).thenReturn(storeItem);
+        StoreItemDTO actual=animalService.carryItem(storeItemDTO);
         assertEquals(storeItemDTO,actual);
         verify(storeItemRepository).save(storeItem);
     }
@@ -238,6 +250,46 @@ public class AnimalServiceTest {
         verify(storeItemRepository).getOne(any());
 
     }
+    @Test
+    public void searchAccessories(){
+        when(storeItemRepository.findAll()).thenReturn(storeItems);
+        List<StoreItemDTO> actual = animalService.searchAccessories("sku", "1");
+        assertEquals(List.of(
+                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10)
+        ), actual);
+
+        actual = animalService.searchAccessories("category", "FOOD", "animal", "cat");
+
+        assertEquals(List.of(
+                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",20.99, 76)
+        ), actual);
+
+        actual = animalService.searchAccessories("animal", "cat","category", "FOOD" );
+
+        assertEquals(List.of(
+                new StoreItemDTO(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",9.99, 10),
+                new StoreItemDTO(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                        "Brand","SomeFood","Food for cats",20.99, 76)
+
+        ), actual);
+
+    }
+    @Test
+    public void searchItemNotExist_BadURL(){
+        when(storeItemRepository.findAll()).thenReturn(storeItems);
+        ItemNotFoundException exception = assertThrows(ItemNotFoundException.class,
+                ()->animalService.searchAccessories("skuu","1"));
+        assertEquals("Item not found or bad URL",exception.getMessage());
+        exception=assertThrows(ItemNotFoundException.class,
+                ()->animalService.searchAccessories("categories", "FOOD", "animal", "cat"));
+        assertEquals("Item not found or bad URL",exception.getMessage());
+    }
+
 
     @Test
     public void purchaseItemFromStoreWithCredit(){

@@ -8,13 +8,12 @@ import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.AnimalReturnDto;
 import com.petstore.dto.StoreItemDTO;
-import com.petstore.model.AnimalType;
-import com.petstore.model.ItemCategory;
+import com.petstore.exception.AddAnimalException;
 import com.petstore.model.Status;
-import com.petstore.model.StoreItem;
 import com.petstore.service.AnimalService;
 import com.petstore.service.ShelterNetService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,9 +44,13 @@ public class PetStoreController {
 
     @PostMapping("animals")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<AnimalDTO> addAnimals(@RequestBody List<Integer> animalIds) {
+    public List<AnimalDTO> addAnimals(@Validated @RequestBody List<Integer> animalIds) {
         List<AnimalDTO> animals = shelterNetService.fetchAnimals(animalIds);
-        return animalService.addAnimals(animals);
+        try {
+            return animalService.addAnimals(animals);
+        } catch (Exception e) {
+            throw new AddAnimalException("Animal already exists");
+        }
     }
 
     @PostMapping("adopt")
@@ -88,7 +91,7 @@ public class PetStoreController {
         HttpStatus shelterNetNotificationStatus = null;
         AdoptionRequestDTO adoptionRequestDTO = animalService.manageRequest(id, processAdoptionRequest);
 
-        if(adoptionRequestDTO != null
+        if (adoptionRequestDTO != null
                 && adoptionRequestDTO.getStatus().equals(Status.APPROVED.name()))
             shelterNetNotificationStatus = shelterNetService.notifyAnimalAdoption(adoptionRequestDTO);
 
@@ -99,30 +102,51 @@ public class PetStoreController {
 
     @PatchMapping("/bondedanimal")
     @ResponseStatus(HttpStatus.OK)
-    public void bondAnimal(@RequestBody List<String> shelternateID){
+    public void bondAnimal(@RequestBody List<String> shelternateID) {
         animalService.bondAnimals(shelternateID);
     }
 
     @GetMapping("/animal/{shelternateID}")
     @ResponseStatus(HttpStatus.OK)
-    public AnimalDTO getAnimal(@PathVariable String shelternateID){
+    public AnimalDTO getAnimal(@PathVariable String shelternateID) {
         return animalService.getAnimal(shelternateID);
     }
 
     @PostMapping("/storeCatalog/carry")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public StoreItemDTO carryItem(@RequestBody StoreItem storeItem){
-        return animalService.carryItem(storeItem);
+    public StoreItemDTO carryItem(@RequestBody StoreItemDTO storeItemDTO) {
+        return animalService.carryItem(storeItemDTO);
     }
 
     @PostMapping("/storeCatalog/add/{id}/{quantity}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public StoreItemDTO carryItem(@PathVariable long id , @PathVariable int quantity){
+    public StoreItemDTO carryItem(@PathVariable long id, @PathVariable int quantity) {
         return animalService.addItemQuantity(id, quantity);
     }
 
+
+    @GetMapping("/items/{searchType}/{searchValue}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<StoreItemDTO> searchAccessoriesSku(@PathVariable String searchType,
+                                                   @PathVariable String searchValue) {
+
+        return animalService.searchAccessories(searchType, searchValue);
+    }
+
+    @GetMapping("/items/{searchType}/{searchValue}/{secondSearchType}/{secondSearchValue}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<StoreItemDTO> searchAccessories(@PathVariable String searchType,
+                                                @PathVariable String searchValue,
+                                                @PathVariable String secondSearchType,
+                                                @PathVariable String secondSearchValue) {
+
+        return animalService.searchAccessories(searchType, searchValue,
+                secondSearchType, secondSearchValue);
+    }
+
+
     @PatchMapping("/storeCatalog/purchaseItem/credit/")
-    public double purchaseItemFromStoreWithCredit(@RequestBody List<ItemPurchaseRequest> itemPurchaseRequests){
+    public double purchaseItemFromStoreWithCredit(@RequestBody List<ItemPurchaseRequest> itemPurchaseRequests) {
         return animalService.purchaseItemFromStoreWithCredit(itemPurchaseRequests);
     }
 

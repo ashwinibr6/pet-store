@@ -21,6 +21,8 @@ public class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(unique = true)
     private String shelternateId;
     private String animalName;
     private String species;
@@ -31,15 +33,15 @@ public class Animal {
     private List<String> bond;
     private String note;
 
-    public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color,List<String> bond,String note) {
+    public Animal(String shelternateId, String animalName, String species, LocalDate birthDate, String sex, String color, List<String> bond, String note) {
         this.shelternateId = shelternateId;
         this.animalName = animalName;
         this.species = species;
         this.birthDate = birthDate;
         this.sex = sex;
         this.color = color;
-        if(bond==null) bond=new ArrayList<>();
-        this.bond= new ArrayList<>(bond);
+        if (bond == null) bond = new ArrayList<>();
+        this.bond = new ArrayList<>(bond);
         this.note = note;
     }
 

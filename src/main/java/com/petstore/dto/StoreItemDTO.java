@@ -6,7 +6,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-@ToString
 public class StoreItemDTO {
     private Long sku;
     private String itemCategory;
@@ -33,4 +32,6 @@ public class StoreItemDTO {
                  name,  description,  price);
         this.quantity = quantity;
     }
+
+
 }

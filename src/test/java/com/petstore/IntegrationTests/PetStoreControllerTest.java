@@ -1,6 +1,5 @@
 package com.petstore.IntegrationTests;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
@@ -9,9 +8,7 @@ import com.petstore.POJO.ProcessAdoptionRequest;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.AnimalReturnDto;
-import com.petstore.model.AdoptionRequest;
-import com.petstore.model.Animal;
-import com.petstore.model.Status;
+import com.petstore.exception.ItemNotFoundException;
 import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
@@ -31,8 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -78,9 +77,16 @@ public class PetStoreControllerTest {
                 new Animal("4", "dog4", "DOG", LocalDate.of(2015, 03, 23), "MALE", "WHITE", new ArrayList<>(), ""),
                 new Animal("5", "bird", "BIRD", LocalDate.of(2015, 03, 23), "FEMALE", "GREEN", new ArrayList<>(), ""));
 
-         storeItems = List.of(new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),"Brand","SomeFood","Food for cats",9.99, 10),
-                 new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.DOG.name(),"Brand","Toy","Toy for dog",4.99, 15),
-                 new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.DOG.name(),"Brand","Home","Home for dog",20.99, 30));
+         storeItems = List.of(new StoreItem(1L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                         "Brand","SomeFood","Food for cats",9.99, 10),
+                 new StoreItem(2L, ItemCategory.TOYS.name(),AnimalType.CAT.name(),
+                         "Brand","SomeFood","Food for cats",4.99, 15),
+                 new StoreItem(4L, ItemCategory.FOOD.name(),AnimalType.CAT.name(),
+                         "Brand","SomeFood","Food for cats",20.99, 76),
+                 new StoreItem(3L, ItemCategory.HOMES.name(),AnimalType.CAT.name(),
+                         "Brand","SomeFood","Food for cats",6.59, 34),
+                 new StoreItem(8L, ItemCategory.FOOD.name(),AnimalType.DOG.name(),
+                         "Brand","SomeFood","Food for cats",2.49, 49));
 
     }
 
@@ -105,7 +111,9 @@ public class PetStoreControllerTest {
     public void retrieveListAnimalsFromShelterAndStore() throws Exception {
         List<Integer> animalsIds = List.of(1, 2, 3, 4, 5);
         MvcResult result = mockMvc
-                .perform(post("/animals").contentType(MediaType.APPLICATION_JSON)
+                .perform(post("/animals")
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(animalsIds)))
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -134,10 +142,30 @@ public class PetStoreControllerTest {
     }
 
     @Test
+    public void addDuplicateAnimals() throws Exception {
+        List<Integer> animalsIds = List.of(1, 2, 3, 4, 5);
+        MvcResult result = mockMvc
+                .perform(post("/animals")
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(animalsIds)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        MvcResult badRequest = mockMvc
+                .perform(post("/animals")
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(animalsIds)))
+                .andReturn();
+    }
+
+    @Test
     public void returnAnimalToShelter() throws Exception {
         animalRepository.saveAll(animalsEntities);
 
         mockMvc.perform(delete("/animalreturns")
+                .with(user("user").password("password"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(List.of(animalsEntities.get(0).getShelternateId(), animalsEntities.get(1).getShelternateId()))))
                 .andExpect(status().isOk());
@@ -148,7 +176,8 @@ public class PetStoreControllerTest {
     public void returnSickAnimalToShelter() throws Exception {
         animalRepository.saveAll(animalsEntities);
 
-        mockMvc.perform(delete("/sickanimal/?shelternateId=1&diagnosis=fever"))
+        mockMvc.perform(delete("/sickanimal/?shelternateId=1&diagnosis=fever")
+                .with(user("user").password("password")))
                 .andExpect(status().isOk());
     }
 
@@ -160,8 +189,11 @@ public class PetStoreControllerTest {
 
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "Approved, ready to be adopted");
 
+
         mockMvc
-                .perform(put("/adopt/request/" + adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                .perform(put("/adopt/request/" + adoptionRequest.getId())
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("adoptionRequestDTO.comment").value("Approved, ready to be adopted"))
@@ -177,6 +209,7 @@ public class PetStoreControllerTest {
         animalRepository.saveAll(animalsEntities);
 
         mockMvc.perform(patch("/bondedanimal")
+                .with(user("user").password("password"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(List.of(1, 2, 3))))
                 .andExpect(status().isOk());
@@ -193,9 +226,6 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("$.sex").value("FEMALE"))
                 .andExpect(jsonPath("$.color").value("BLACK"))
                 .andExpect(jsonPath("$.bond").value(expected));
-
-
-
     }
 
     @Test
@@ -207,7 +237,9 @@ public class PetStoreControllerTest {
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
 
         mockMvc
-                .perform(put("/adopt/request/" + adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                .perform(put("/adopt/request/" + adoptionRequest.getId())
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("adoptionRequestDTO.comment").value("Denied, Can't be adopted"))
@@ -233,7 +265,9 @@ public class PetStoreControllerTest {
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
 
         mockMvc
-                .perform(put("/adopt/request/" + adoptionRequest.getId()).contentType(MediaType.APPLICATION_JSON)
+                .perform(put("/adopt/request/" + adoptionRequest.getId())
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("adoptionRequestDTO.comment").value("Denied, Can't be adopted"))
@@ -252,6 +286,7 @@ public class PetStoreControllerTest {
 
 
         MvcResult mvcResult = mockMvc.perform(delete("/animals/return-request")
+                .with(user("user").password("password"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(List.of(animalsEntities.get(0).getShelternateId(), animalsEntities.get(1).getShelternateId()))))
                 .andExpect(status().isOk())
@@ -264,7 +299,9 @@ public class PetStoreControllerTest {
     @Test
     public void carryItemToStoreCatalog() throws Exception {
 
-       mockMvc.perform(post("/storeCatalog/carry").contentType(MediaType.APPLICATION_JSON)
+       mockMvc.perform(post("/storeCatalog/carry")
+               .with(user("user").password("password"))
+               .contentType(MediaType.APPLICATION_JSON)
        .content(mapper.writeValueAsString(storeItems.get(0))))
                .andExpect(status().isAccepted())
                .andExpect(jsonPath("sku").value(1))
@@ -283,7 +320,8 @@ public class PetStoreControllerTest {
 
         StoreItem storeItem = storeItemRepository.save(storeItems.get(0));
         int quantity = 5;
-        mockMvc.perform(post("/storeCatalog/add/"+ storeItem.getId()+"/"+quantity))
+        mockMvc.perform(post("/storeCatalog/add/"+ storeItem.getId()+"/"+quantity)
+                .with(user("user").password("password")))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("sku").value(1))
                 .andExpect(jsonPath("itemCategory").value("FOOD"))
@@ -293,6 +331,67 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("description").value("Food for cats"))
                 .andExpect(jsonPath("price").value("9.99"))
                 .andExpect(jsonPath("quantity").value(15));
+    }
+
+    @Test
+    public void searchAccessories() throws Exception {
+
+        List<StoreItem> items = storeItemRepository.saveAll(storeItems);
+        String searchType = "sku";
+        String searchvalue= "1";
+        mockMvc
+                .perform(get("/items/"+searchType+"/"+searchvalue))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].sku").value(1))
+                .andExpect(jsonPath("$.[0].itemCategory").value("FOOD"))
+                .andExpect(jsonPath("$.[0].animalType").value("CAT"))
+                .andExpect(jsonPath("$.[0].brand").value("Brand"))
+                .andExpect(jsonPath("$.[0].name").value("SomeFood"))
+                .andExpect(jsonPath("$.[0].description").value("Food for cats"))
+                .andExpect(jsonPath("$.[0].price").value("9.99"))
+                .andExpect(jsonPath("$.[0].quantity").value(10));
+
+         searchType = "animal";
+         searchvalue= "CAT";
+         String searchAnimalType = "category";
+         String searchAnimalValue = "TOYS";
+         mockMvc
+                .perform(get("/items/"+searchType+"/"+searchvalue
+                + "/" +searchAnimalType + "/" +searchAnimalValue))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].sku").value(2))
+                .andExpect(jsonPath("$.[0].itemCategory").value("TOYS"))
+                .andExpect(jsonPath("$.[0].animalType").value("CAT"))
+                .andExpect(jsonPath("$.[0].brand").value("Brand"))
+                .andExpect(jsonPath("$.[0].name").value("SomeFood"))
+                .andExpect(jsonPath("$.[0].description").value("Food for cats"))
+                .andExpect(jsonPath("$.[0].price").value("4.99"))
+                .andExpect(jsonPath("$.[0].quantity").value(15));
+
+    }
+
+    @Test
+    public void searchAccessories_BadRequest() throws Exception {
+
+        List<StoreItem> items = storeItemRepository.saveAll(storeItems);
+        String searchType = "skuu";
+        String searchvalue= "1";
+        mockMvc
+                .perform(get("/items/"+searchType+"/"+searchvalue))
+                .andExpect(status().isBadRequest())
+                .andExpect(result->assertTrue(result.getResolvedException() instanceof ItemNotFoundException))
+                .andExpect(result ->assertEquals("Item not found or bad URL",result.getResolvedException().getMessage()));
+
+        searchType = "animals";
+        searchvalue= "CAT";
+        String searchAnimalType = "categories";
+        String searchAnimalValue = "TOYS";
+        mockMvc
+                .perform(get("/items/"+searchType+"/"+searchvalue
+                        + "/" +searchAnimalType + "/" +searchAnimalValue))
+                .andExpect(status().isBadRequest())
+                .andExpect(result->assertTrue(result.getResolvedException() instanceof ItemNotFoundException))
+                .andExpect(result ->assertEquals("Item not found or bad URL",result.getResolvedException().getMessage()));
     }
 
     @Test
