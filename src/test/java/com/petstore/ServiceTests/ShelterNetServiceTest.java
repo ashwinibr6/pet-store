@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
+import com.petstore.dto.ConvertListofIdsToArrayDTO;
 import com.petstore.model.Status;
 import com.petstore.service.ShelterNetService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
@@ -32,10 +34,13 @@ public class ShelterNetServiceTest {
 
     ObjectMapper objectMapper;
     List<AnimalDTO> animalsDTO;
+    ConvertListofIdsToArrayDTO convertListofIdsToArrayDTO ;
+
 
     @BeforeEach
     public void setUp(){
         objectMapper = new ObjectMapper();
+        convertListofIdsToArrayDTO = new ConvertListofIdsToArrayDTO();
         animalsDTO =  List.of(
                 new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",List.of("2","3"),"Bob is super friendly"),
                 new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",List.of("1","3"),"Seems to have fleas"),
@@ -46,7 +51,7 @@ public class ShelterNetServiceTest {
     }
 
     @Test
-    public void fetchAnimalsFromShelterNet() throws JsonProcessingException {
+    public void fetchAnimalsFromShelterNet() throws Exception {
         List<Integer> animalsIds = List.of(1,2,3,4,5);
 
         /* To be uncommented once we get shelter end point*/
@@ -80,11 +85,11 @@ public class ShelterNetServiceTest {
         AdoptionRequestDTO adoptionRequestDTO = new AdoptionRequestDTO("customer",animalsDTO, Status.APPROVED.name()
                 , "Approved, ready to be adopted");
 
-
-        /* To be uncommented once we get shelter end point*/
-//        Mockito
-//                .when(restTemplate.postForObject("http://localhost/add-comment", adoptionRequestDTO, HttpStatus.class))
-//          .thenReturn(HttpStatus.OK);
+        convertListofIdsToArrayDTO.setAnimalIds(List.of(1,2,3,4,5));
+        Mockito
+                .when(restTemplate.postForObject("https://shelternet.herokuapp.com/animals/adopted",
+                        convertListofIdsToArrayDTO, HttpStatus.class))
+          .thenReturn(HttpStatus.OK);
 
 
         HttpStatus actual = shelterNetService.notifyAnimalAdoption(adoptionRequestDTO);

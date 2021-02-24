@@ -1,9 +1,11 @@
 package com.petstore.service;
 
-import com.petstore.dto.AdoptionRequestDTO;
-import com.petstore.dto.AnimalDTO;
-import com.petstore.dto.AnimalReturnDto;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.petstore.dto.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,22 +19,22 @@ import java.util.stream.Collectors;
 public class ShelterNetService {
 
     private RestTemplate restTemplate;
+    ConvertListofIdsToArrayDTO convertListofIdsToArrayDTO = new ConvertListofIdsToArrayDTO();
+    private ObjectMapper mapper = new ObjectMapper();
 
     public ShelterNetService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public List<AnimalDTO> fetchAnimals(List<Integer> animalsIds) {
-        List<AnimalDTO> animalsDto = List.of(
-                new AnimalDTO("1","cat1","CAT", LocalDate.of(2015,03,23),"FEMALE","BLACK",List.of("2","3"),"Bob is super friendly"),
-                new AnimalDTO( "2","cat2","CAT",LocalDate.of(2016,03,23),"MALE","BROWN",List.of("1","3"),"Seems to have fleas"),
-                new AnimalDTO( "3","dog1","DOG",LocalDate.of(2017,03,23),"FEMALE","YELLOW",List.of("1","2"),""),
-                new AnimalDTO("4","dog4","DOG", LocalDate.of(2015,03,23),"MALE","WHITE",new ArrayList<>(),""),
-                new AnimalDTO( "5","bird","BIRD", LocalDate.of(2015,03,23),"FEMALE","GREEN",new ArrayList<>(),"")
-        );
-        /* TO BE IMPLEMENTED */
-      // String result = restTemplate.postForObject("http://localhost/add-comment", animalsIds, String.class);
-       // List<AnimalDTO> actual = mapper.readValue(result, new TypeReference<List<AnimalDTO>>() {
+    public List<AnimalDTO> fetchAnimals(List<Integer> animalsIds) throws Exception {
+        convertListofIdsToArrayDTO.setAnimalIds(animalsIds);
+        restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("user", "stagingPass1"));
+        String result = restTemplate.postForObject("http://shelternet-staging.herokuapp.com/animals/request/", convertListofIdsToArrayDTO, String.class);
+        List<FetchReturnAnimalsDTO> fetchReturnAnimalsDTOS = mapper.readValue(result, new TypeReference<List<FetchReturnAnimalsDTO>>() {});
+
+        List<AnimalDTO> animalsDto = fetchReturnAnimalsDTOS.stream().map(fetchReturnAnimalsDTO ->
+                new AnimalDTO(String.valueOf(fetchReturnAnimalsDTO.getId()), fetchReturnAnimalsDTO.getName(), fetchReturnAnimalsDTO.getSpecies(), LocalDate.parse(fetchReturnAnimalsDTO.getBirthDate()),
+                        fetchReturnAnimalsDTO.getSex(), fetchReturnAnimalsDTO.getColor(), null, fetchReturnAnimalsDTO.getNotes())).collect(Collectors.toList());
         return animalsDto;
     }
 
@@ -51,9 +53,16 @@ public class ShelterNetService {
     }
 
     public HttpStatus notifyAnimalAdoption(AdoptionRequestDTO adoptionRequestDTO) {
-//        HttpStatus status=restTemplate.postForObject("https://shelternet.herokuapp.com/add-comment",
-//                adoptionRequestDTO, HttpStatus.class);
-//        return status;
-        return HttpStatus.OK;
+        List<Integer> shelterNetIds = adoptionRequestDTO.getAnimalDTOS()
+                .stream().map(animaldto -> Integer.parseInt(animaldto.getShelternateId())).collect(Collectors.toList());
+
+        convertListofIdsToArrayDTO.setAnimalIds(shelterNetIds);
+        restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("user", "stagingPass1"));
+
+        ResponseEntity<String> status=restTemplate.postForEntity(
+                "https://shelternet-staging.herokuapp.com/animals/adopted",
+                convertListofIdsToArrayDTO, String.class);
+        return status.getStatusCode();
+
     }
 }
