@@ -1,37 +1,52 @@
 = Pet Store API
 
-== Home
+== Home API
 .request
 include::{snippets}/home/http-request.adoc[]
 
 .response
 include::{snippets}/home/http-response.adoc[]
 
-== Fetch animal from ShelterNet and add to pet store
-.request
-include::{snippets}/fetchAnimals/http-request.adoc[]
-
-.response
-include::{snippets}/fetchAnimals/http-response.adoc[]
-
-== Create animal adoption request with the pet store
-.request
-include::{snippets}/createAdoptAnimalRequest/http-request.adoc[]
-
-.response
-include::{snippets}/createAdoptAnimalRequest/http-response.adoc[]
-
-
-== Get All animals from Pet Store
+== Get Animals API
+=== Get All animals from Pet Store
 .request
 include::{snippets}/getAllAnimals/http-request.adoc[]
 
 .response
 include::{snippets}/getAllAnimals/http-response.adoc[]
 
+.response-fields
+include::{snippets}/getAllAnimals/response-fields.adoc[]
 
 
-== Return Animal to Shelter
+=== Get animal By shelternateID
+.request
+include::{snippets}/getAnimal/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/getAnimal/path-parameters.adoc[]
+
+.response
+include::{snippets}/getAnimal/http-response.adoc[]
+
+.response-fields
+include::{snippets}/getAnimal/response-fields.adoc[]
+
+
+== Add Animal API
+=== Fetch animal from ShelterNet and add to pet store
+.request
+include::{snippets}/fetchAnimals/http-request.adoc[]
+
+.response
+include::{snippets}/fetchAnimals/http-response.adoc[]
+
+.response-fields
+include::{snippets}/fetchAnimals/response-fields.adoc[]
+
+== Return Animal API
+
+=== Return Animal to Shelter
 .request
 include::{snippets}/returnAnimalToShelter/http-request.adoc[]
 
@@ -39,88 +54,173 @@ include::{snippets}/returnAnimalToShelter/http-request.adoc[]
 include::{snippets}/returnAnimalToShelter/http-response.adoc[]
 
 
-== Return Sick Animal to Shelter
+=== Return Sick Animal to Shelter
 .request
 include::{snippets}/returnSickAnimalToShelter/http-request.adoc[]
+
+.request-parameters
+include::{snippets}/returnSickAnimalToShelter/request-parameters.adoc[]
 
 .response
 include::{snippets}/returnSickAnimalToShelter/http-response.adoc[]
 
 
-== Bond animals
-.request
-include::{snippets}/bondedanimal/http-request.adoc[]
-
-.response
-include::{snippets}/bondedanimal/http-response.adoc[]
-
-== Return animal By shelternateID
-.request
-include::{snippets}/getAnimal/http-request.adoc[]
-
-.response
-include::{snippets}/getAnimal/http-response.adoc[]
-
-== Approve animal adoption request
-.request
-include::{snippets}/ApproveAdoptionRequest/http-request.adoc[]
-
-.response
-include::{snippets}/ApproveAdoptionRequest/http-response.adoc[]
-
-== Deny animal adoption request for Inseparable animals
-.request
-include::{snippets}/DenyInSeparableAdoptionRequest/http-request.adoc[]
-
-.response
-include::{snippets}/DenyInSeparableAdoptionRequest/http-response.adoc[]
-
-== Deny animal adoption request for Non-separable animals
-.request
-include::{snippets}/DenyNonSeparableAdoptionRequest/http-request.adoc[]
-
-.response
-include::{snippets}/DenyNonSeparableAdoptionRequest/http-response.adoc[]
-
-== Return Requested animal to ShelterNet
+=== Return Requested animal to ShelterNet
 .request
 include::{snippets}/returnRequestedAnimalToShelter/http-request.adoc[]
 
 .response
 include::{snippets}/returnRequestedAnimalToShelter/http-response.adoc[]
 
-== Carry item to the store catalog
+.response-fields
+include::{snippets}/returnRequestedAnimalToShelter/response-fields.adoc[]
+
+
+== Bond Animal API
+
+=== Bond animals
 .request
-include::{snippets}/carryItemToStoreCatalog/http-request.adoc[]
+include::{snippets}/bondedanimal/http-request.adoc[]
 
 .response
-include::{snippets}/carryItemToStoreCatalog/http-response.adoc[]
+include::{snippets}/bondedanimal/http-response.adoc[]
 
-== Adding item quantity to the catalog
+== Pet Adoption API
+
+=== Create animal adoption request with the pet store
 .request
-include::{snippets}/AddItemQuantityToStoreCatalog/http-request.adoc[]
+include::{snippets}/createAdoptAnimalRequest/http-request.adoc[]
+
+.request-fields
+include::{snippets}/createAdoptAnimalRequest/request-fields.adoc[]
 
 .response
-include::{snippets}/AddItemQuantityToStoreCatalog/http-response.adoc[]
+include::{snippets}/createAdoptAnimalRequest/http-response.adoc[]
 
-== Search by SKU
+.response-fields
+include::{snippets}/createAdoptAnimalRequest/response-fields.adoc[]
+
+
+=== Approve animal adoption request
+.request
+include::{snippets}/ApproveAdoptionRequest/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/ApproveAdoptionRequest/path-parameters.adoc[]
+
+.request-fields
+include::{snippets}/ApproveAdoptionRequest/request-fields.adoc[]
+
+.response
+include::{snippets}/ApproveAdoptionRequest/http-response.adoc[]
+
+.response-fields
+include::{snippets}/ApproveAdoptionRequest/response-fields.adoc[]
+
+
+=== Deny animal adoption request for Inseparable animals
+.request
+include::{snippets}/DenyInSeparableAdoptionRequest/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/DenyInSeparableAdoptionRequest/path-parameters.adoc[]
+
+
+.request-fields
+include::{snippets}/DenyInSeparableAdoptionRequest/request-fields.adoc[]
+
+.response
+include::{snippets}/DenyInSeparableAdoptionRequest/http-response.adoc[]
+
+.response-fields
+include::{snippets}/DenyInSeparableAdoptionRequest/response-fields.adoc[]
+
+
+=== Deny animal adoption request for Non-separable animals
+.request
+include::{snippets}/DenyNonSeparableAdoptionRequest/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/DenyNonSeparableAdoptionRequest/path-parameters.adoc[]
+
+.request-fields
+include::{snippets}/DenyNonSeparableAdoptionRequest/request-fields.adoc[]
+
+.response
+include::{snippets}/DenyNonSeparableAdoptionRequest/http-response.adoc[]
+
+.response-fields
+include::{snippets}/DenyNonSeparableAdoptionRequest/response-fields.adoc[]
+
+
+== Search StoreItems API
+
+=== Search by SKU
 .request
 include::{snippets}/searchBySku/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/searchBySku/path-parameters.adoc[]
 
 .response
 include::{snippets}/searchBySku/http-response.adoc[]
 
-== Search by category and animal type
+.response-fields
+include::{snippets}/searchBySku/response-fields.adoc[]
+
+
+=== Search by category and animal type
 .request
 include::{snippets}/searchByCategoryAndAnimalType/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/searchByCategoryAndAnimalType/path-parameters.adoc[]
 
 .response
 include::{snippets}/searchByCategoryAndAnimalType/http-response.adoc[]
 
+.response-fields
+include::{snippets}/searchByCategoryAndAnimalType/response-fields.adoc[]
 
-== Purchase item from store with credit
+== Add StoreItem API
+
+=== Carry item to the store catalog
+.request
+include::{snippets}/carryItemToStoreCatalog/http-request.adoc[]
+
+.request-fields
+include::{snippets}/carryItemToStoreCatalog/request-fields.adoc[]
+
+.response
+include::{snippets}/carryItemToStoreCatalog/http-response.adoc[]
+
+.response-fields
+include::{snippets}/carryItemToStoreCatalog/response-fields.adoc[]
+
+
+=== Adding item quantity to the catalog
+.request
+include::{snippets}/AddItemQuantityToStoreCatalog/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/AddItemQuantityToStoreCatalog/path-parameters.adoc[]
+
+.response
+include::{snippets}/AddItemQuantityToStoreCatalog/http-response.adoc[]
+
+.response-fields
+include::{snippets}/AddItemQuantityToStoreCatalog/response-fields.adoc[]
+
+
+== Purchase StoreItem API
+
+=== Purchase item from store with credit
 .request
 include::{snippets}/PurchaseItemFromStoreWithCredit/http-request.adoc[]
 
+.request-fields
+include::{snippets}/PurchaseItemFromStoreWithCredit/request-fields.adoc[]
+
 .response
 include::{snippets}/PurchaseItemFromStoreWithCredit/http-response.adoc[]
+

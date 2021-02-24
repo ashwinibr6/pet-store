@@ -118,7 +118,7 @@ public class PetStoreController {
         return animalService.carryItem(storeItemDTO);
     }
 
-    @PostMapping("/storeCatalog/add/{id}/{quantity}")
+    @PatchMapping("/items/{id}/quantity/{quantity}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public StoreItemDTO carryItem(@PathVariable long id, @PathVariable int quantity) {
         return animalService.addItemQuantity(id, quantity);
