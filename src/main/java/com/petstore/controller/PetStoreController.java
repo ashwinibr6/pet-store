@@ -44,7 +44,7 @@ public class PetStoreController {
 
     @PostMapping("animals")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<AnimalDTO> addAnimals(@Validated @RequestBody List<Integer> animalIds) {
+    public List<AnimalDTO> addAnimals(@Validated @RequestBody List<Integer> animalIds) throws Exception {
         List<AnimalDTO> animals = shelterNetService.fetchAnimals(animalIds);
         try {
             return animalService.addAnimals(animals);
