@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petstore.POJO.CustomerRequest;
 import com.petstore.POJO.ItemPurchaseRequest;
 import com.petstore.POJO.ProcessAdoptionRequest;
-import com.petstore.dto.StoreItemDTO;
 import com.petstore.dto.AdoptionRequestDTO;
 import com.petstore.dto.AnimalDTO;
 import com.petstore.dto.AnimalReturnDto;
@@ -24,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -37,7 +35,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -114,8 +111,7 @@ public class PetStoreRestDocs {
         when(animalService.addAnimals(any())).thenReturn(animalsDTO);
         mockMvc
                 .perform(post("/animals")
-                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                        .with(user("user").password("password"))
+                        .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(animalsIds)))
                 .andExpect(status().isCreated())
@@ -187,8 +183,7 @@ public class PetStoreRestDocs {
 
         mockMvc
                 .perform(delete("/animalreturns")
-                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                        .with(user("user").password("password"))
+                        .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(animalsIds))).andExpect(status().isOk())
                 .andDo(document("returnAnimalToShelter"));
@@ -201,8 +196,7 @@ public class PetStoreRestDocs {
 
         mockMvc
                 .perform(delete("/sickanimal/?shelternateId=1&diagnosis=fever")
-                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                        .with(user("user").password("password")))
+                        .header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
                         .andExpect(status().isOk())
                 .andDo(document("returnSickAnimalToShelter", requestParameters(
                         parameterWithName("shelternateId").description("ShelternateId of the animal"),
@@ -212,8 +206,7 @@ public class PetStoreRestDocs {
     @Test
     public void bondAnimal() throws Exception {
         mockMvc.perform(patch("/bondedanimal")
-                .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                .with(user("user").password("password"))
+                .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(List.of(1,2))))
                 .andExpect(status().isOk()).andDo(document("bondedanimal"));
@@ -243,8 +236,7 @@ public class PetStoreRestDocs {
 
         mockMvc
                 .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",1)
-                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                        .with(user("user").password("password"))
+                        .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
@@ -277,8 +269,7 @@ public class PetStoreRestDocs {
 
         mockMvc
                 .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",1)
-                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                        .with(user("user").password("password"))
+                        .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
@@ -316,8 +307,7 @@ public class PetStoreRestDocs {
 
         mockMvc
                 .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",1)
-                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                        .with(user("user").password("password"))
+                        .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
@@ -345,8 +335,7 @@ public class PetStoreRestDocs {
     public void returnRequestedAnimalToShelter() throws Exception{
         when(animalService.returnRequestedAnimalToShelter(any())).thenReturn(animalReturnDtos);
         mockMvc.perform(delete("/animals/return-request")
-                .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                .with(user("user").password("password"))
+                .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(List.of(animalsDTO.get(0).getShelternateId(), animalsDTO.get(1).getShelternateId()))))
                 .andExpect(status().isOk())
@@ -360,8 +349,7 @@ public class PetStoreRestDocs {
         when(animalService.carryItem(any())).thenReturn(storeItemDTOS.get(0));
 
         mockMvc.perform(post("/storeCatalog/carry")
-                .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                .with(user("user").password("password"))
+                .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(storeItemDTOS.get(0))))
                 .andExpect(status().isAccepted())
@@ -390,8 +378,7 @@ public class PetStoreRestDocs {
     public void addItemToStoreCatalog() throws Exception {
         when(animalService.addItemQuantity(1, 5)).thenReturn(storeItemDTOS.get(0));
         mockMvc.perform(RestDocumentationRequestBuilders.post("/storeCatalog/add/{id}/{quantity}",1,5)
-                .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
-                .with(user("user").password("password")))
+                .header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
                 .andExpect(status().isAccepted())
                 .andDo(document("AddItemQuantityToStoreCatalog"
                         ,pathParameters(
