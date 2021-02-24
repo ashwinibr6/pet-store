@@ -51,7 +51,7 @@ public class ShelterNetService {
     }
 
     public HttpStatus notifyAnimalAdoption(AdoptionRequestDTO adoptionRequestDTO) {
-//        HttpStatus status=restTemplate.postForObject("http://localhost/add-comment",
+//        HttpStatus status=restTemplate.postForObject("https://shelternet.herokuapp.com/add-comment",
 //                adoptionRequestDTO, HttpStatus.class);
 //        return status;
         return HttpStatus.OK;
