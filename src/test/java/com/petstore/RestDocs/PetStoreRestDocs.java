@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,10 +35,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -113,7 +113,10 @@ public class PetStoreRestDocs {
 
         when(animalService.addAnimals(any())).thenReturn(animalsDTO);
         mockMvc
-                .perform(post("/animals").contentType(MediaType.APPLICATION_JSON)
+                .perform(post("/animals")
+                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(animalsIds)))
                 .andExpect(status().isCreated())
                 .andDo(document("fetchAnimals", responseFields(
@@ -138,7 +141,10 @@ public class PetStoreRestDocs {
                 .perform(post("/adopt").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(customerRequest)))
                 .andExpect(status().isCreated())
-                .andDo(document("createAdoptAnimalRequest", responseFields(
+                .andDo(document("createAdoptAnimalRequest", requestFields(
+                        fieldWithPath("client").description("Name of the client"),
+                        fieldWithPath("shelterNetIds").description("ShelterNetIds of animals")
+                ), responseFields(
                         fieldWithPath("client").description("Name of the client"),
                         fieldWithPath("comment").description("The comment of the request approval"),
                         fieldWithPath("status").description("The status of the request"),
@@ -180,7 +186,10 @@ public class PetStoreRestDocs {
         List<String> animalsIds = List.of("1","2");
 
         mockMvc
-                .perform(delete("/animalreturns").contentType(MediaType.APPLICATION_JSON)
+                .perform(delete("/animalreturns")
+                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(animalsIds))).andExpect(status().isOk())
                 .andDo(document("returnAnimalToShelter"));
     }
@@ -191,13 +200,20 @@ public class PetStoreRestDocs {
         when(shelterNetService.returnSickAnimalToShelter(any(), any())).thenReturn(HttpStatus.OK);
 
         mockMvc
-                .perform(delete("/sickanimal/?shelternateId=1&diagnosis=fever"))
+                .perform(delete("/sickanimal/?shelternateId=1&diagnosis=fever")
+                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                        .with(user("user").password("password")))
                         .andExpect(status().isOk())
-                .andDo(document("returnSickAnimalToShelter"));
+                .andDo(document("returnSickAnimalToShelter", requestParameters(
+                        parameterWithName("shelternateId").description("ShelternateId of the animal"),
+                        parameterWithName("diagnosis").description("Diagnosis of the animal")
+                )));
     }
     @Test
     public void bondAnimal() throws Exception {
         mockMvc.perform(patch("/bondedanimal")
+                .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                .with(user("user").password("password"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(List.of(1,2))))
                 .andExpect(status().isOk()).andDo(document("bondedanimal"));
@@ -226,11 +242,17 @@ public class PetStoreRestDocs {
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "Approved, ready to be adopted");
 
         mockMvc
-                .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",1).contentType(MediaType.APPLICATION_JSON)
+                .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",1)
+                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
                 .andDo(document("ApproveAdoptionRequest",pathParameters(
-                        parameterWithName("id").description("The adoption request ID")),responseFields(
+                        parameterWithName("id").description("The adoption request ID")),requestFields(
+                        fieldWithPath("status").description("Status to be updated in adoption request"),
+                        fieldWithPath("comment").description("Comments for the adoption request")
+                ),responseFields(
                         fieldWithPath("adoptionRequestDTO.comment").description("The comment of the request approval"),
                         fieldWithPath("adoptionRequestDTO.status").description("The status of the request"),
                         fieldWithPath("adoptionRequestDTO.client").description("The client details"),
@@ -254,11 +276,17 @@ public class PetStoreRestDocs {
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
 
         mockMvc
-                .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",1).contentType(MediaType.APPLICATION_JSON)
+                .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",1)
+                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
                 .andDo(document("DenyInSeparableAdoptionRequest",pathParameters(
-                        parameterWithName("id").description("The adoption request ID")),responseFields(
+                        parameterWithName("id").description("The adoption request ID")),requestFields(
+                        fieldWithPath("status").description("Status to be updated in adoption request"),
+                        fieldWithPath("comment").description("Comments for the adoption request")
+                ),responseFields(
                         fieldWithPath("adoptionRequestDTO.comment").description("The comment of the request approval"),
                         fieldWithPath("adoptionRequestDTO.status").description("The status of the request"),
                         fieldWithPath("adoptionRequestDTO.client").description("The client details"),
@@ -287,11 +315,17 @@ public class PetStoreRestDocs {
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
 
         mockMvc
-                .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",1).contentType(MediaType.APPLICATION_JSON)
+                .perform(RestDocumentationRequestBuilders.put("/adopt/request/{id}",1)
+                        .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(processRequest)))
                 .andExpect(status().isAccepted())
                 .andDo(document("DenyNonSeparableAdoptionRequest",pathParameters(
-                        parameterWithName("id").description("The adoption request ID")),responseFields(
+                        parameterWithName("id").description("The adoption request ID")),requestFields(
+                        fieldWithPath("status").description("Status to be updated in adoption request"),
+                        fieldWithPath("comment").description("Comments for the adoption request")
+                ),responseFields(
                         fieldWithPath("adoptionRequestDTO.comment").description("The comment of the request approval"),
                         fieldWithPath("adoptionRequestDTO.status").description("The status of the request"),
                         fieldWithPath("adoptionRequestDTO.client").description("The client details"),
@@ -311,6 +345,8 @@ public class PetStoreRestDocs {
     public void returnRequestedAnimalToShelter() throws Exception{
         when(animalService.returnRequestedAnimalToShelter(any())).thenReturn(animalReturnDtos);
         mockMvc.perform(delete("/animals/return-request")
+                .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                .with(user("user").password("password"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(List.of(animalsDTO.get(0).getShelternateId(), animalsDTO.get(1).getShelternateId()))))
                 .andExpect(status().isOk())
@@ -323,10 +359,22 @@ public class PetStoreRestDocs {
     public void carryItemToStoreCatalog() throws Exception {
         when(animalService.carryItem(any())).thenReturn(storeItemDTOS.get(0));
 
-        mockMvc.perform(post("/storeCatalog/carry").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/storeCatalog/carry")
+                .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                .with(user("user").password("password"))
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(storeItemDTOS.get(0))))
                 .andExpect(status().isAccepted())
-                .andDo(document("carryItemToStoreCatalog",
+                .andDo(document("carryItemToStoreCatalog",requestFields(
+                        fieldWithPath("sku").description("stocking unit -- ID"),
+                        fieldWithPath("itemCategory").description("Item category: FOOD,TOYS,HOMES,CARRIES"),
+                        fieldWithPath("animalType").description("Animal typ: CAT,DOG,BIRD"),
+                        fieldWithPath("brand").description("The item brand"),
+                        fieldWithPath("name").description("The item name"),
+                        fieldWithPath("description").description("The item description"),
+                        fieldWithPath("quantity").description("The item quantity to be added"),
+                        fieldWithPath("price").description("The item price")
+                        ),
                         responseFields(
                         fieldWithPath("sku").description("stocking unit -- ID"),
                         fieldWithPath("itemCategory").description("Item category: FOOD,TOYS,HOMES,CARRIES"),
@@ -341,7 +389,9 @@ public class PetStoreRestDocs {
     @Test
     public void addItemToStoreCatalog() throws Exception {
         when(animalService.addItemQuantity(1, 5)).thenReturn(storeItemDTOS.get(0));
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/storeCatalog/add/{id}/{quantity}",1,5))
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/storeCatalog/add/{id}/{quantity}",1,5)
+                .header("Authorization", "Basic dXNlcjpzZWNyZXQ=")
+                .with(user("user").password("password")))
                 .andExpect(status().isAccepted())
                 .andDo(document("AddItemQuantityToStoreCatalog"
                         ,pathParameters(
@@ -418,6 +468,9 @@ public class PetStoreRestDocs {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(itemPurchaseRequestList)))
                 .andExpect(status().isOk())
-                .andDo(document("PurchaseItemFromStoreWithCredit"));
+                .andDo(document("PurchaseItemFromStoreWithCredit",requestFields(
+                       fieldWithPath("[].sku").description("Item's sku"),
+                       fieldWithPath("[].quantity").description("Quantity to be purchased")
+                )));
     }
 }
