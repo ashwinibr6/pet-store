@@ -62,10 +62,11 @@ public class PetStoreController {
     @DeleteMapping("/animalreturns")
     @ResponseStatus(HttpStatus.OK)
     public void returnAnimalToShelter(@RequestBody List<String> shelterIds) {
-        HttpStatus status = shelterNetService.returnAnimalToShelter(shelterIds);
-        if (status.is2xxSuccessful()) {
-            animalService.removeAnimals(shelterIds);
-        }
+//        HttpStatus status =
+        shelterNetService.returnAnimalToShelter(shelterIds);
+//        if (status.is2xxSuccessful()) {
+//            animalService.removeAnimals(shelterIds);
+//        }
     }
 
     @DeleteMapping("/animals/return-request")

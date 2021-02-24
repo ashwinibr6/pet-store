@@ -46,7 +46,7 @@ public class ShelterNetServiceTest {
     }
 
     @Test
-    public void fetchAnimalsFromShelterNet() throws JsonProcessingException {
+    public void fetchAnimalsFromShelterNet() throws Exception {
         List<Integer> animalsIds = List.of(1,2,3,4,5);
 
         /* To be uncommented once we get shelter end point*/
