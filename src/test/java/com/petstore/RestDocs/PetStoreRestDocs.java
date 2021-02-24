@@ -377,7 +377,7 @@ public class PetStoreRestDocs {
     @Test
     public void addItemToStoreCatalog() throws Exception {
         when(animalService.addItemQuantity(1, 5)).thenReturn(storeItemDTOS.get(0));
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/storeCatalog/add/{id}/{quantity}",1,5)
+        mockMvc.perform(RestDocumentationRequestBuilders.patch("/items/{id}/quantity/{quantity}",1,5)
                 .header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
                 .andExpect(status().isAccepted())
                 .andDo(document("AddItemQuantityToStoreCatalog"

@@ -320,7 +320,7 @@ public class PetStoreControllerTest {
 
         StoreItem storeItem = storeItemRepository.save(storeItems.get(0));
         int quantity = 5;
-        mockMvc.perform(post("/storeCatalog/add/"+ storeItem.getId()+"/"+quantity)
+        mockMvc.perform(patch("/items/"+ storeItem.getId()+"/quantity/"+quantity)
                 .with(user("user").password("password")))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("sku").value(1))
@@ -378,7 +378,7 @@ public class PetStoreControllerTest {
         String searchvalue= "1";
         mockMvc
                 .perform(get("/items/"+searchType+"/"+searchvalue))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(result->assertTrue(result.getResolvedException() instanceof ItemNotFoundException))
                 .andExpect(result ->assertEquals("Item not found or bad URL",result.getResolvedException().getMessage()));
 
@@ -389,7 +389,7 @@ public class PetStoreControllerTest {
         mockMvc
                 .perform(get("/items/"+searchType+"/"+searchvalue
                         + "/" +searchAnimalType + "/" +searchAnimalValue))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(result->assertTrue(result.getResolvedException() instanceof ItemNotFoundException))
                 .andExpect(result ->assertEquals("Item not found or bad URL",result.getResolvedException().getMessage()));
     }
