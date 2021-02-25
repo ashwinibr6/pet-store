@@ -13,6 +13,4 @@ import java.util.List;
 public class ConvertListofIdsToArrayDTO {
 
     private List<Integer> animalIds;
-
-
 }

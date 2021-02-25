@@ -29,12 +29,12 @@ public class ShelterNetService {
     public List<AnimalDTO> fetchAnimals(List<Integer> animalsIds) throws Exception {
         convertListofIdsToArrayDTO.setAnimalIds(animalsIds);
         restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("user", "stagingPass1"));
-        String result = restTemplate.postForObject("http://shelternet-staging.herokuapp.com/animals/request/", convertListofIdsToArrayDTO, String.class);
-        List<FetchReturnAnimalsDTO> fetchReturnAnimalsDTOS = mapper.readValue(result, new TypeReference<List<FetchReturnAnimalsDTO>>() {});
+        ResponseEntity<String> result= restTemplate.postForEntity("https://shelternet-staging.herokuapp.com/animals/request/", convertListofIdsToArrayDTO, String.class);
+        List<FetchReturnAnimalsDTO> fetchReturnAnimalsDTOS = mapper.readValue(result.getBody(), new TypeReference<List<FetchReturnAnimalsDTO>>() {});
 
         List<AnimalDTO> animalsDto = fetchReturnAnimalsDTOS.stream().map(fetchReturnAnimalsDTO ->
                 new AnimalDTO(String.valueOf(fetchReturnAnimalsDTO.getId()), fetchReturnAnimalsDTO.getName(), fetchReturnAnimalsDTO.getSpecies(), LocalDate.parse(fetchReturnAnimalsDTO.getBirthDate()),
-                        fetchReturnAnimalsDTO.getSex(), fetchReturnAnimalsDTO.getColor(), null, fetchReturnAnimalsDTO.getNotes())).collect(Collectors.toList());
+                        fetchReturnAnimalsDTO.getSex(), fetchReturnAnimalsDTO.getColor(), new ArrayList<>(), fetchReturnAnimalsDTO.getNotes())).collect(Collectors.toList());
         return animalsDto;
     }
 
@@ -58,11 +58,9 @@ public class ShelterNetService {
 
         convertListofIdsToArrayDTO.setAnimalIds(shelterNetIds);
         restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("user", "stagingPass1"));
-
         ResponseEntity<String> status=restTemplate.postForEntity(
                 "https://shelternet-staging.herokuapp.com/animals/adopted",
                 convertListofIdsToArrayDTO, String.class);
         return status.getStatusCode();
-
     }
 }
