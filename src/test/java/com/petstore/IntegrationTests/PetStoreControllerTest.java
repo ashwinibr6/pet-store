@@ -13,11 +13,14 @@ import com.petstore.model.*;
 import com.petstore.repository.AdoptionRequestRepository;
 import com.petstore.repository.AnimalRepository;
 import com.petstore.repository.StoreItemRepository;
+import com.petstore.service.ShelterNetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -29,6 +32,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -52,6 +57,9 @@ public class PetStoreControllerTest {
 
     @Autowired
     StoreItemRepository storeItemRepository;
+
+    @MockBean
+    ShelterNetService shelterNetService;
 
     ObjectMapper mapper;
     List<AnimalDTO> animalsDTO;
@@ -110,6 +118,8 @@ public class PetStoreControllerTest {
     @Test
     public void retrieveListAnimalsFromShelterAndStore() throws Exception {
         List<Integer> animalsIds = List.of(1, 2, 3, 4, 5);
+        when(shelterNetService.fetchAnimals(animalsIds)).thenReturn(animalsDTO);
+
         MvcResult result = mockMvc
                 .perform(post("/animals")
                         .with(user("user").password("password"))
@@ -163,7 +173,7 @@ public class PetStoreControllerTest {
     @Test
     public void returnAnimalToShelter() throws Exception {
         animalRepository.saveAll(animalsEntities);
-
+        when(shelterNetService.returnAnimalToShelter(any())).thenReturn(HttpStatus.OK);
         mockMvc.perform(delete("/animalreturns")
                 .with(user("user").password("password"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -175,7 +185,7 @@ public class PetStoreControllerTest {
     @Test
     public void returnSickAnimalToShelter() throws Exception {
         animalRepository.saveAll(animalsEntities);
-
+        when(shelterNetService.returnSickAnimalToShelter(any(),any())).thenReturn(HttpStatus.OK);
         mockMvc.perform(delete("/sickanimal/?shelternateId=1&diagnosis=fever")
                 .with(user("user").password("password")))
                 .andExpect(status().isOk());
@@ -186,10 +196,8 @@ public class PetStoreControllerTest {
         animalsEntities = animalRepository.saveAll(animalsEntities);
         AdoptionRequest adoptionRequest = new AdoptionRequest("customer", animalsEntities, Status.PENDING.toString());
         adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
-
+        when(shelterNetService.notifyAnimalAdoption(any())).thenReturn(HttpStatus.OK);
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.APPROVED.toString(), "Approved, ready to be adopted");
-
-
         mockMvc
                 .perform(put("/adopt/request/" + adoptionRequest.getId())
                         .with(user("user").password("password"))
@@ -200,8 +208,6 @@ public class PetStoreControllerTest {
                 .andExpect(jsonPath("adoptionRequestDTO.status").value("APPROVED"))
                 .andExpect(jsonPath("adoptionRequestDTO.client").value("customer"))
                 .andExpect(jsonPath("shelterNetNotificationStatus").value("OK"));
-
-
     }
 
     @Test
@@ -233,7 +239,7 @@ public class PetStoreControllerTest {
         animalsEntities = animalRepository.saveAll(animalsEntities);
         AdoptionRequest adoptionRequest = new AdoptionRequest("customer", animalsEntities, Status.PENDING.toString());
         adoptionRequest = adoptionRequestRepository.save(adoptionRequest);
-
+        //when(shelterNetService.notifyAnimalAdoption(any())).thenReturn(HttpStatus.OK);
         ProcessAdoptionRequest processRequest = new ProcessAdoptionRequest(Status.DENIED.toString(), "Denied, Can't be adopted");
 
         mockMvc

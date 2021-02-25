@@ -71,13 +71,6 @@ public class AnimalService {
     public List<AnimalDTO> addAnimals(List<AnimalDTO> animals) {
         List<Animal> animalList = animals.stream().map(animalDto -> mapTo(animalDto)).collect(Collectors.toList());
         animalList = animalRepository.saveAll(animalList);
-
-//        try{
-//            animalList = animalRepository.saveAll(animalList);
-//        }catch (ConstraintViolationException e){
-//            throw new AddAnimalException("Animal already exists");
-//        }
-
         List<AnimalDTO> animalsDtos = animalList.stream().map(animal -> mapToDto(animal)).collect(Collectors.toList());
         return animalsDtos;
     }
@@ -214,6 +207,5 @@ public class AnimalService {
             return availableItems.stream().map(item -> storeItemToDto(item)).collect(Collectors.toList());
         } else throw new ItemNotFoundException("Item not found or bad URL");
 
-        //  return null;
     }
 }
